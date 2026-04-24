@@ -48,7 +48,7 @@ export default function Abastecimentos() {
     if (values.veiculo_id && values.km_atual) {
       const v = veiculos.find(x => x.id === values.veiculo_id);
       if (v && Number(values.km_atual) > v.km_atual) {
-        await supabase.from("veiculos").update({ km_atual: Number(values.km_atual) }).eq("id", v.id);
+        await (supabase.from("veiculos") as any).update({ km_atual: Number(values.km_atual) }).eq("id", v.id);
         const { data } = await supabase.from("veiculos").select("*");
         setVeiculos((data ?? []) as Veiculo[]);
       }
