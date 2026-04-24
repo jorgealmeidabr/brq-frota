@@ -111,7 +111,14 @@ export default function Motoristas() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => setEditing(m)}><Pencil className="mr-2 h-4 w-4" />Editar</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => navigate(`/motoristas/${m.id}`)}><Eye className="mr-2 h-4 w-4" />Ver detalhes</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => update(m.id, { status: "inativo" })}>Inativar</DropdownMenuItem>
+                            <ConfirmDialog
+                              title="Inativar motorista"
+                              description={`Confirma inativar ${m.nome}?`}
+                              confirmLabel="Inativar"
+                              destructive
+                              onConfirm={() => update(m.id, { status: "inativo" })}
+                              trigger={<DropdownMenuItem onSelect={(e) => e.preventDefault()}>Inativar</DropdownMenuItem>}
+                            />
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
