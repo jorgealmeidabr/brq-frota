@@ -13,6 +13,7 @@ import Setup from "./pages/Setup";
 import Veiculos from "./pages/Veiculos";
 import VeiculoDetalhe from "./pages/VeiculoDetalhe";
 import Motoristas from "./pages/Motoristas";
+import MotoristaDetalhe from "./pages/MotoristaDetalhe";
 import Manutencoes from "./pages/Manutencoes";
 import Abastecimentos from "./pages/Abastecimentos";
 import Agendamentos from "./pages/Agendamentos";
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/veiculos" element={<Protected><Veiculos /></Protected>} />
             <Route path="/veiculos/:id" element={<Protected><VeiculoDetalhe /></Protected>} />
             <Route path="/motoristas" element={<Protected><Motoristas /></Protected>} />
+            <Route path="/motoristas/:id" element={<Protected><MotoristaDetalhe /></Protected>} />
             <Route path="/manutencoes" element={<Protected><Manutencoes /></Protected>} />
             <Route path="/abastecimentos" element={<Protected><Abastecimentos /></Protected>} />
             <Route path="/agendamentos" element={<Protected><Agendamentos /></Protected>} />
