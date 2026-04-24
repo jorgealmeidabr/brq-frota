@@ -119,7 +119,7 @@ export default function Agendamentos() {
         status: "agendado",
         km_saida: pickedVeiculo.km_atual,
       });
-      await supabase.from("veiculos").update({ status: "reservado" }).eq("id", pickedVeiculo.id);
+      await (supabase.from("veiculos") as any).update({ status: "reservado" }).eq("id", pickedVeiculo.id);
       await reloadVeiculos();
       setPickedVeiculo(null);
       setForm({});
@@ -148,7 +148,7 @@ export default function Agendamentos() {
         observacoes: retForm.observacoes ?? returning.observacoes,
         status: "concluido",
       } as Partial<Agendamento>);
-      await supabase.from("veiculos").update({
+      await (supabase.from("veiculos") as any).update({
         status: "disponivel",
         km_atual: retForm.km_retorno,
       }).eq("id", returning.veiculo_id);
@@ -163,7 +163,7 @@ export default function Agendamentos() {
 
   const cancelar = async (a: Agendamento) => {
     await update(a.id, { status: "cancelado" } as Partial<Agendamento>);
-    await supabase.from("veiculos").update({ status: "disponivel" }).eq("id", a.veiculo_id);
+    await (supabase.from("veiculos") as any).update({ status: "disponivel" }).eq("id", a.veiculo_id);
     await reloadVeiculos();
   };
 
