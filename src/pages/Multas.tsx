@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, AlertCircle } from "lucide-react";
+import { CheckCircle2, AlertCircle, Download } from "lucide-react";
+import { downloadCSV } from "@/lib/csv";
 
 export default function Multas() {
   const { rows, loading, insert, update, remove, reload } = useTable<Multa>("multas");
@@ -77,7 +78,23 @@ export default function Multas() {
   return (
     <>
       <PageHeader title="Multas" subtitle="Controle de infrações e pagamentos"
-        actions={isAdmin && <FormDialog<Multa> title="Nova multa" fields={fields} onSubmit={insert} />} />
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" disabled={filtered.length === 0}
+              onClick={() => downloadCSV(
+                `multas_${new Date().toISOString().slice(0,10)}.csv`,
+                ["Veículo", "Motorista", "Data", "Infração", "Valor", "Pontos", "Status", "Auto"],
+                filtered.map(r => [
+                  veiculos.find(v => v.id === r.veiculo_id)?.placa ?? "—",
+                  motoristas.find(m => m.id === r.motorista_id)?.nome ?? "—",
+                  r.data_infracao, r.tipo_infracao, r.valor, r.pontos_cnh, r.status_pagamento, r.auto_infracao ?? "",
+                ]),
+              )}>
+              <Download className="mr-1 h-4 w-4" />Exportar CSV
+            </Button>
+            {isAdmin && <FormDialog<Multa> title="Nova multa" fields={fields} onSubmit={insert} />}
+          </div>
+        } />
 
       <div className="grid gap-4 md:grid-cols-3 mb-4">
         <KpiCard label="Pendente de pagamento" value={fmtBRL(totals.pendente)} icon={AlertCircle} tone="destructive" hint="Soma dos valores com status pendente" />

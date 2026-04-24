@@ -8,7 +8,9 @@ import { supabase } from "@/lib/supabase";
 import { fmtBRL, fmtDate, fmtNumber } from "@/lib/format";
 import type { Abastecimento, Veiculo, Motorista } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Droplet, DollarSign, Gauge, AlertTriangle } from "lucide-react";
+import { Droplet, DollarSign, Gauge, AlertTriangle, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { downloadCSV } from "@/lib/csv";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
@@ -123,7 +125,23 @@ export default function Abastecimentos() {
   return (
     <>
       <PageHeader title="Abastecimentos" subtitle="Consumo médio e custo por km calculados automaticamente"
-        actions={<FormDialog<Abastecimento> title="Novo abastecimento" fields={fields} onSubmit={handleInsert} />} />
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" disabled={rows.length === 0}
+              onClick={() => downloadCSV(
+                `abastecimentos_${new Date().toISOString().slice(0,10)}.csv`,
+                ["Veículo", "Data", "Km", "Litros", "Valor", "Posto", "Consumo (km/L)", "Custo/km"],
+                rows.map(r => [
+                  veiculos.find(v => v.id === r.veiculo_id)?.placa ?? "—",
+                  r.data, r.km_atual, r.litros, r.valor_total, r.posto ?? "",
+                  r.consumo_km_l ?? "", r.custo_por_km ?? "",
+                ]),
+              )}>
+              <Download className="mr-1 h-4 w-4" />Exportar CSV
+            </Button>
+            <FormDialog<Abastecimento> title="Novo abastecimento" fields={fields} onSubmit={handleInsert} />
+          </div>
+        } />
 
       <div className="grid gap-4 md:grid-cols-3 mb-4">
         <KpiCard label="Litros no mês" value={fmtNumber(monthKpis.litros, { maximumFractionDigits: 1 })} icon={Droplet} tone="info" />
