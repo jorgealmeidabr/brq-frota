@@ -167,7 +167,18 @@ export default function Manutencoes() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => setEditing(m)}><Pencil className="mr-2 h-4 w-4" />Editar</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => remove(m.id)} className="text-destructive"><Trash2 className="mr-2 h-4 w-4" />Excluir</DropdownMenuItem>
+                            <ConfirmDialog
+                              destructive
+                              title="Excluir manutenção"
+                              description="Esta ação não pode ser desfeita."
+                              confirmLabel="Excluir"
+                              onConfirm={() => remove(m.id)}
+                              trigger={
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive">
+                                  <Trash2 className="mr-2 h-4 w-4" />Excluir
+                                </DropdownMenuItem>
+                              }
+                            />
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}
