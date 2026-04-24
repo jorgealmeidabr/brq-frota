@@ -17,6 +17,11 @@ export interface FieldDef {
   options?: { label: string; value: string }[];
   step?: string;
   bucket?: Bucket;
+  /** Valida o valor; retorne mensagem de erro ou null. */
+  validate?: (v: any) => string | null;
+  /** Formata o valor enquanto digita (ex: placa, telefone). */
+  format?: (v: string) => string;
+  placeholder?: string;
 }
 
 interface Props<T extends Record<string, any>> {
@@ -38,18 +43,28 @@ export function FormDialog<T extends Record<string, any>>({
   const isOpen = isControlled ? open! : internal;
   const setOpen = (v: boolean) => { isControlled ? onOpenChange?.(v) : setInternal(v); };
   const [values, setValues] = useState<Record<string, any>>({ ...initial });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const change = (name: string, v: any) => setValues(s => ({ ...s, [name]: v }));
+  const change = (field: FieldDef, raw: any) => {
+    const v = field.format && typeof raw === "string" ? field.format(raw) : raw;
+    setValues(s => ({ ...s, [field.name]: v }));
+    if (field.validate) {
+      const err = field.validate(v);
+      setErrors(s => ({ ...s, [field.name]: err ?? "" }));
+    } else if (errors[field.name]) {
+      setErrors(s => ({ ...s, [field.name]: "" }));
+    }
+  };
 
   const handleFile = async (field: FieldDef, file: File | null) => {
     if (!file || !field.bucket) return;
     setUploading(field.name);
     try {
       const url = await uploadFile(field.bucket, file);
-      change(field.name, url);
+      setValues(s => ({ ...s, [field.name]: url }));
       toast({ title: "Foto enviada" });
     } catch (e: any) {
       toast({ title: "Erro no upload", description: e.message, variant: "destructive" });
@@ -60,6 +75,19 @@ export function FormDialog<T extends Record<string, any>>({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Valida todos
+    const newErr: Record<string, string> = {};
+    fields.forEach(f => {
+      if (f.validate) {
+        const err = f.validate(values[f.name]);
+        if (err) newErr[f.name] = err;
+      }
+    });
+    if (Object.keys(newErr).length) {
+      setErrors(newErr);
+      toast({ title: "Verifique os campos destacados", variant: "destructive" });
+      return;
+    }
     setSaving(true);
     try { await onSubmit(values as Partial<T>); setOpen(false); } finally { setSaving(false); }
   };
@@ -80,15 +108,15 @@ export function FormDialog<T extends Record<string, any>>({
                 <Label htmlFor={f.name}>{f.label}{f.required && <span className="text-destructive"> *</span>}</Label>
               )}
               {f.type === "select" ? (
-                <Select value={values[f.name] ?? ""} onValueChange={(v) => change(f.name, v)}>
+                <Select value={values[f.name] ?? ""} onValueChange={(v) => change(f, v)}>
                   <SelectTrigger id={f.name}><SelectValue placeholder="Selecione..." /></SelectTrigger>
                   <SelectContent>{f.options?.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                 </Select>
               ) : f.type === "textarea" ? (
-                <Textarea id={f.name} value={values[f.name] ?? ""} onChange={(e) => change(f.name, e.target.value)} required={f.required} />
+                <Textarea id={f.name} value={values[f.name] ?? ""} onChange={(e) => change(f, e.target.value)} required={f.required} placeholder={f.placeholder} />
               ) : f.type === "checkbox" ? (
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" id={f.name} checked={!!values[f.name]} onChange={(e) => change(f.name, e.target.checked)} className="h-4 w-4 rounded border-border" />
+                  <input type="checkbox" id={f.name} checked={!!values[f.name]} onChange={(e) => change(f, e.target.checked)} className="h-4 w-4 rounded border-border" />
                   <Label htmlFor={f.name} className="text-sm text-muted-foreground">{f.label}</Label>
                 </div>
               ) : f.type === "file" ? (
@@ -108,9 +136,10 @@ export function FormDialog<T extends Record<string, any>>({
                   </div>
                 </div>
               ) : (
-                <Input id={f.name} type={f.type ?? "text"} step={f.step} required={f.required}
-                       value={values[f.name] ?? ""} onChange={(e) => change(f.name, f.type === "number" ? (e.target.value === "" ? "" : Number(e.target.value)) : e.target.value)} />
+                <Input id={f.name} type={f.type ?? "text"} step={f.step} required={f.required} placeholder={f.placeholder}
+                       value={values[f.name] ?? ""} onChange={(e) => change(f, f.type === "number" ? (e.target.value === "" ? "" : Number(e.target.value)) : e.target.value)} />
               )}
+              {errors[f.name] && <p className="text-xs text-destructive">{errors[f.name]}</p>}
             </div>
           ))}
           <DialogFooter>

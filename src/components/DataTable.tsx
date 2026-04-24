@@ -3,6 +3,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { ListSkeleton } from "@/components/Skeletons";
 
 export interface Column<T> {
   header: string;
@@ -21,6 +23,8 @@ interface Props<T> {
 
 export function DataTable<T extends { id: string }>({ rows, loading, columns, onEdit, onDelete, empty = "Nenhum registro." }: Props<T>) {
   const { isAdmin } = useAuth();
+  if (loading) return <ListSkeleton rows={5} />;
+
   return (
     <Card className="shadow-card">
       <CardContent className="p-0">
@@ -33,9 +37,7 @@ export function DataTable<T extends { id: string }>({ rows, loading, columns, on
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading ? (
-                <TableRow><TableCell colSpan={columns.length + 1} className="py-10 text-center text-muted-foreground">Carregando...</TableCell></TableRow>
-              ) : rows.length === 0 ? (
+              {rows.length === 0 ? (
                 <TableRow><TableCell colSpan={columns.length + 1} className="py-10 text-center text-muted-foreground">{empty}</TableCell></TableRow>
               ) : rows.map(r => (
                 <TableRow key={r.id}>
@@ -44,7 +46,18 @@ export function DataTable<T extends { id: string }>({ rows, loading, columns, on
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
                         {onEdit && <Button size="icon" variant="ghost" onClick={() => onEdit(r)}><Pencil className="h-4 w-4" /></Button>}
-                        {onDelete && <Button size="icon" variant="ghost" onClick={() => { if (confirm("Confirmar exclusão?")) onDelete(r); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>}
+                        {onDelete && (
+                          <ConfirmDialog
+                            destructive
+                            title="Excluir registro"
+                            description="Esta ação não pode ser desfeita. Deseja excluir este registro?"
+                            confirmLabel="Excluir"
+                            onConfirm={() => onDelete(r)}
+                            trigger={
+                              <Button size="icon" variant="ghost"><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                            }
+                          />
+                        )}
                       </div>
                     </TableCell>
                   )}

@@ -2,8 +2,13 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+interface Props {
+  children: React.ReactNode;
+  requireAdmin?: boolean;
+}
+
+export function ProtectedRoute({ children, requireAdmin }: Props) {
+  const { user, loading, isAdmin } = useAuth();
   const location = useLocation();
 
   if (!isSupabaseConfigured) {
@@ -14,6 +19,9 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
   if (!user) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+  if (requireAdmin && !isAdmin) {
+    return <Navigate to="/agendamentos" replace />;
   }
   return <>{children}</>;
 }
