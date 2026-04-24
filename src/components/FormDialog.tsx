@@ -108,15 +108,15 @@ export function FormDialog<T extends Record<string, any>>({
                 <Label htmlFor={f.name}>{f.label}{f.required && <span className="text-destructive"> *</span>}</Label>
               )}
               {f.type === "select" ? (
-                <Select value={values[f.name] ?? ""} onValueChange={(v) => change(f.name, v)}>
+                <Select value={values[f.name] ?? ""} onValueChange={(v) => change(f, v)}>
                   <SelectTrigger id={f.name}><SelectValue placeholder="Selecione..." /></SelectTrigger>
                   <SelectContent>{f.options?.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
                 </Select>
               ) : f.type === "textarea" ? (
-                <Textarea id={f.name} value={values[f.name] ?? ""} onChange={(e) => change(f.name, e.target.value)} required={f.required} />
+                <Textarea id={f.name} value={values[f.name] ?? ""} onChange={(e) => change(f, e.target.value)} required={f.required} placeholder={f.placeholder} />
               ) : f.type === "checkbox" ? (
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" id={f.name} checked={!!values[f.name]} onChange={(e) => change(f.name, e.target.checked)} className="h-4 w-4 rounded border-border" />
+                  <input type="checkbox" id={f.name} checked={!!values[f.name]} onChange={(e) => change(f, e.target.checked)} className="h-4 w-4 rounded border-border" />
                   <Label htmlFor={f.name} className="text-sm text-muted-foreground">{f.label}</Label>
                 </div>
               ) : f.type === "file" ? (
@@ -136,9 +136,10 @@ export function FormDialog<T extends Record<string, any>>({
                   </div>
                 </div>
               ) : (
-                <Input id={f.name} type={f.type ?? "text"} step={f.step} required={f.required}
-                       value={values[f.name] ?? ""} onChange={(e) => change(f.name, f.type === "number" ? (e.target.value === "" ? "" : Number(e.target.value)) : e.target.value)} />
+                <Input id={f.name} type={f.type ?? "text"} step={f.step} required={f.required} placeholder={f.placeholder}
+                       value={values[f.name] ?? ""} onChange={(e) => change(f, f.type === "number" ? (e.target.value === "" ? "" : Number(e.target.value)) : e.target.value)} />
               )}
+              {errors[f.name] && <p className="text-xs text-destructive">{errors[f.name]}</p>}
             </div>
           ))}
           <DialogFooter>
