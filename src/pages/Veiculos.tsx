@@ -15,12 +15,20 @@ import { useAuth } from "@/hooks/useAuth";
 import { fmtNumber } from "@/lib/format";
 import type { Veiculo } from "@/lib/types";
 import { Plus, Search, MoreVertical, Car, Pencil, Eye, PowerOff } from "lucide-react";
+import { validarPlaca, formatarPlaca, validarAno } from "@/lib/validators";
+import { EmptyState } from "@/components/EmptyState";
+import { CardGridSkeleton } from "@/components/Skeletons";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const fields: FieldDef[] = [
-  { name: "placa", label: "Placa", required: true },
+  { name: "placa", label: "Placa", required: true,
+    placeholder: "AAA-0000 ou AAA0A00",
+    format: formatarPlaca, validate: validarPlaca },
   { name: "marca", label: "Marca", required: true },
   { name: "modelo", label: "Modelo", required: true },
-  { name: "ano", label: "Ano", type: "number", required: true },
+  { name: "ano", label: "Ano", type: "number", required: true,
+    validate: (v) => validarAno(v) },
   { name: "tipo", label: "Tipo", type: "select", required: true,
     options: [{ label: "Carro", value: "carro" }, { label: "Moto", value: "moto" }, { label: "Caminhão", value: "caminhao" }, { label: "Van", value: "van" }] },
   { name: "combustivel", label: "Combustível", type: "select", required: true,
@@ -105,9 +113,10 @@ export default function Veiculos() {
       </div>
 
       {loading ? (
-        <p className="text-muted-foreground">Carregando...</p>
+        <CardGridSkeleton count={8} />
       ) : filtered.length === 0 ? (
-        <Card><CardContent className="py-12 text-center text-muted-foreground">Nenhum veículo encontrado.</CardContent></Card>
+        <EmptyState icon={Car} title="Nenhum veículo encontrado"
+          description={busca || fStatus !== "todos" || fTipo !== "todos" || fComb !== "todos" ? "Ajuste os filtros para ver mais resultados." : "Cadastre o primeiro veículo da frota."} />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map(v => (
