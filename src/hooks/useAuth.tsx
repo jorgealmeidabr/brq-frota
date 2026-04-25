@@ -32,13 +32,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadPerfil = useCallback(async (uid: string) => {
     // 1. usuarios_perfis (novo sistema de permissões)
-    const { data: perf } = await supabase
+    const { data: perfRaw } = await (supabase as any)
       .from("usuarios_perfis").select("*").eq("user_id", uid).maybeSingle();
+    const perf = perfRaw as UsuarioPerfil | null;
     if (perf) {
-      setPerfil(perf as UsuarioPerfil);
+      setPerfil(perf);
       setRole(perf.tipo_conta === "admin" ? "admin" : "motorista");
       // touch last_login (best-effort)
-      supabase.from("usuarios_perfis").update({ last_login: new Date().toISOString() } as any).eq("user_id", uid).then(() => {});
+      (supabase as any).from("usuarios_perfis")
+        .update({ last_login: new Date().toISOString() })
+        .eq("user_id", uid).then(() => {});
       return;
     }
     // 2. Fallback: user_roles legado
