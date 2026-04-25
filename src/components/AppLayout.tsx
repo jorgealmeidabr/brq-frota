@@ -52,8 +52,8 @@ function AppSidebar({ alertCount }: { alertCount: number }) {
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
-              <span className="text-sm font-bold text-sidebar-foreground">FleetManager</span>
-              <span className="text-[10px] uppercase tracking-wider text-sidebar-foreground/60">BRQ • Frota Interna</span>
+              <span className="text-sm font-bold text-sidebar-foreground">BRQ - FROTA INTERNA</span>
+              <span className="text-[10px] uppercase tracking-wider text-sidebar-foreground/60">gestão de frotas</span>
             </div>
           )}
         </div>
@@ -114,7 +114,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-border bg-background/80 px-3 backdrop-blur">
             <SidebarTrigger />
             <div className="ml-2 hidden text-sm font-medium text-muted-foreground md:block">
-              FleetManager
             </div>
             <div className="ml-auto flex items-center gap-2">
               <GlobalSearch />
