@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { KpiCard } from "@/components/KpiCard";
 import { useTable } from "@/hooks/useTable";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { supabase } from "@/lib/supabase";
 import { fmtBRL, fmtDate } from "@/lib/format";
 import type { Multa, Veiculo, Motorista } from "@/lib/types";
@@ -15,10 +16,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, AlertCircle, Download } from "lucide-react";
 import { downloadCSV } from "@/lib/csv";
+import { Money } from "@/components/Money";
 
 export default function Multas() {
   const { rows, loading, insert, update, remove, reload } = useTable<Multa>("multas");
   const { isAdmin } = useAuth();
+  const { canSeeFinancial } = usePermissions();
   const [editing, setEditing] = useState<Multa | null>(null);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
@@ -80,7 +83,7 @@ export default function Multas() {
       <PageHeader title="Multas" subtitle="Controle de infrações e pagamentos"
         actions={
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" disabled={filtered.length === 0}
+            <Button variant="outline" size="sm" disabled={filtered.length === 0 || !canSeeFinancial()} title={!canSeeFinancial() ? "Sem permissão para exportar valores" : ""}
               onClick={() => downloadCSV(
                 `multas_${new Date().toISOString().slice(0,10)}.csv`,
                 ["Veículo", "Motorista", "Data", "Infração", "Valor", "Pontos", "Status", "Auto"],
@@ -97,8 +100,8 @@ export default function Multas() {
         } />
 
       <div className="grid gap-4 md:grid-cols-3 mb-4">
-        <KpiCard label="Pendente de pagamento" value={fmtBRL(totals.pendente)} icon={AlertCircle} tone="destructive" hint="Soma dos valores com status pendente" />
-        <KpiCard label="Pago" value={fmtBRL(totals.pago)} icon={CheckCircle2} tone="success" />
+        <KpiCard label="Pendente de pagamento" value={canSeeFinancial() ? fmtBRL(totals.pendente) : "🔒 ••••"} icon={AlertCircle} tone="destructive" hint="Soma dos valores com status pendente" />
+        <KpiCard label="Pago" value={canSeeFinancial() ? fmtBRL(totals.pago) : "🔒 ••••"} icon={CheckCircle2} tone="success" />
         <KpiCard label="Pontos CNH (não pagos)" value={totals.pontosPend} tone="warning" />
       </div>
 
@@ -138,7 +141,7 @@ export default function Multas() {
           { header: "Veículo", cell: r => <span className="font-mono">{vL(r.veiculo_id)}</span> },
           { header: "Motorista", cell: r => mL(r.motorista_id) },
           { header: "Infração", cell: r => r.tipo_infracao },
-          { header: "Valor", cell: r => fmtBRL(Number(r.valor)) },
+          { header: "Valor", cell: r => <Money value={Number(r.valor)} /> },
           { header: "Pontos", cell: r => r.pontos_cnh },
           { header: "Auto", cell: r => r.auto_infracao ?? "—" },
           { header: "Pagamento", cell: r => <StatusBadge status={r.status_pagamento} /> },
