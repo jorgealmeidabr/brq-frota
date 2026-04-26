@@ -340,62 +340,51 @@ function UserWizard({
   const submit = async () => {
     setSaving(true);
     try {
-      // 1. Resolver/criar motorista
-      let motoristaId: string;
       if (editing) {
-        motoristaId = editing.motorista_id;
+        // === Modo edição: atualiza motorista + perfil ===
+        const motoristaId = editing.motorista_id;
         await (supabase as any).from("motoristas").update({
           nome, email, telefone: telefone || null, cargo: cargo || null,
           cnh_numero: cnhNum || "00000000000",
           cnh_categoria: cnhCat,
           cnh_validade: cnhVal || new Date(Date.now() + 5*365*86400000).toISOString().slice(0,10),
         }).eq("id", motoristaId);
-      } else if (linkExisting && existingMot) {
-        motoristaId = existingMot.id;
-      } else {
-        const { data: mNew, error: mErr } = await (supabase as any).from("motoristas").insert({
-          nome, email, telefone: telefone || null, cargo: cargo || null,
-          cnh_numero: cnhNum || "00000000000",
-          cnh_categoria: cnhCat,
-          cnh_validade: cnhVal || new Date(Date.now() + 5*365*86400000).toISOString().slice(0,10),
-          status: "ativo",
-        }).select().single();
-        if (mErr) throw mErr;
-        motoristaId = (mNew as Motorista).id;
-      }
 
-      // 2. Criar usuário Auth (apenas no modo criar)
-      let userId: string;
-      if (editing) {
-        userId = editing.user_id;
-        // Atualizar perfil
         const finalPerms = tipoConta === "admin" ? PERMISSOES_TUDO : perms;
         await (supabase as any).from("usuarios_perfis").update({
           tipo_conta: tipoConta, permissoes: finalPerms, motorista_id: motoristaId,
         }).eq("id", editing.id);
         toast({ title: "Usuário atualizado" });
       } else {
-        // signUp com senha temporária
-        const { data: signed, error: sErr } = await supabase.auth.signUp({
-          email, password: senha,
-          options: { data: { nome }, emailRedirectTo: `${window.location.origin}/setup-senha` },
-        });
-        if (sErr) throw sErr;
-        userId = signed.user!.id;
-
-        // Vincula motorista ao user_id
-        await (supabase as any).from("motoristas").update({ user_id: userId }).eq("id", motoristaId);
-
+        // === Modo criar: edge function faz Auth + motorista + perfil ===
         const finalPerms = tipoConta === "admin" ? PERMISSOES_TUDO : perms;
-        const { error: pErr } = await (supabase as any).from("usuarios_perfis").insert({
-          user_id: userId, motorista_id: motoristaId,
-          tipo_conta: tipoConta, permissoes: finalPerms, ativo: true,
-          must_change_password: true,
-        });
-        if (pErr) throw pErr;
+        const linkId = linkExisting && existingMot ? existingMot.id : null;
+
+        const { data: fnData, error: fnErr } = await supabase.functions.invoke(
+          "admin-create-user",
+          {
+            body: {
+              email,
+              senha,
+              nome,
+              telefone: telefone || null,
+              cargo,
+              cnh_numero: cnhNum || null,
+              cnh_categoria: cnhCat || null,
+              cnh_validade: cnhVal || null,
+              tipo_conta: tipoConta,
+              permissoes: finalPerms,
+              link_motorista_id: linkId,
+            },
+          },
+        );
+
+        if (fnErr) throw new Error(fnErr.message);
+        if (fnData && (fnData as any).error) throw new Error((fnData as any).error);
+
         toast({
           title: "Usuário criado",
-          description: `Senha temporária: ${senha} — copie e envie ao usuário.`,
+          description: `Senha temporária: ${senha} — anote antes de fechar.`,
         });
       }
       onSaved();
@@ -575,9 +564,21 @@ function UserWizard({
             </div>
 
             {!editing && (
-              <div className="rounded-md border border-info/30 bg-info/10 p-3 text-sm">
-                <Mail className="mr-1 inline h-4 w-4" />
-                O usuário receberá a senha temporária <strong className="font-mono">{senha}</strong> e será obrigado a trocá-la no primeiro acesso.
+              <div className="rounded-lg border-2 border-warning/60 bg-warning/15 p-4">
+                <p className="mb-2 text-sm font-semibold text-warning-foreground">
+                  ⚠️ Senha temporária — anote antes de continuar:
+                </p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 rounded-md border border-warning/40 bg-background/80 px-4 py-3 text-center font-mono text-2xl font-bold tracking-widest">
+                    {senha}
+                  </code>
+                  <Button type="button" variant="outline" size="icon" onClick={copyPwd} title="Copiar senha">
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Esta senha não será exibida novamente. O usuário deverá trocá-la no primeiro acesso.
+                </p>
               </div>
             )}
           </div>
