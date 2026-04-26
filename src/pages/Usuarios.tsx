@@ -387,36 +387,6 @@ function UserWizard({
           description: `Senha temporária: ${senha} — anote antes de fechar.`,
         });
       }
-        const finalPerms = tipoConta === "admin" ? PERMISSOES_TUDO : perms;
-        const linkId = linkExisting && existingMot ? existingMot.id : null;
-
-        const { data: fnData, error: fnErr } = await supabase.functions.invoke(
-          "admin-create-user",
-          {
-            body: {
-              email,
-              senha,
-              nome,
-              telefone: telefone || null,
-              cargo,
-              cnh_numero: cnhNum || null,
-              cnh_categoria: cnhCat || null,
-              cnh_validade: cnhVal || null,
-              tipo_conta: tipoConta,
-              permissoes: finalPerms,
-              link_motorista_id: linkId,
-            },
-          },
-        );
-
-        if (fnErr) throw new Error(fnErr.message);
-        if (fnData && (fnData as any).error) throw new Error((fnData as any).error);
-
-        toast({
-          title: "Usuário criado",
-          description: `Senha temporária: ${senha} — copie e envie ao usuário.`,
-        });
-      }
       onSaved();
       onOpenChange(false);
     } catch (e: any) {
