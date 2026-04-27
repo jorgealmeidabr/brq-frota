@@ -227,6 +227,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+      </ErrorBoundary>
 
       <Card className="mt-6 shadow-card">
         <CardHeader>
