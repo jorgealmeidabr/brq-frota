@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2 } from "lucide-react";
-import brqLogo from "@/assets/brq-logo.jpg";
+import brqLogo from "@/assets/brq-logo-interna.png";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
@@ -51,8 +51,13 @@ function AppSidebar({ alertCount }: { alertCount: number }) {
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-2">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white shadow-elevated">
-            <img src={brqLogo} alt="BRQ Frota Interna" className="h-full w-full object-contain" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white">
+            <img
+              src={brqLogo}
+              alt="BRQ Frota Interna"
+              style={{ mixBlendMode: "multiply" }}
+              className="h-full w-full object-contain"
+            />
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">

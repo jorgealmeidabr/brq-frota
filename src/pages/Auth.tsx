@@ -7,7 +7,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { validarEmail } from "@/lib/validators";
-import brqLogo from "@/assets/brq-logo-full.jpeg";
+import { Mail, Lock } from "lucide-react";
+import brqLogo from "@/assets/brq-logo-interna.png";
 
 export default function Auth() {
   const { user, signIn } = useAuth();
@@ -52,123 +53,150 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      {/* Lado esquerdo - Logo (amarelo com animação) */}
-      <div className="relative flex items-center justify-center overflow-hidden bg-[#FFD600] p-8 md:w-[65%] md:p-12">
-        {/* Padrão animado de formas geométricas */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-          <span className="absolute left-[10%] top-[15%] h-24 w-24 rounded-full bg-[#E6C200] opacity-60 animate-float-slow" />
-          <span className="absolute right-[15%] top-[25%] h-16 w-16 rotate-45 bg-[#E6C200] opacity-50 animate-float-medium" />
-          <span className="absolute left-[20%] bottom-[20%] h-32 w-32 rounded-full bg-[#E6C200] opacity-40 animate-float-fast" />
-          <span className="absolute right-[25%] bottom-[15%] h-20 w-20 rotate-45 bg-[#E6C200] opacity-50 animate-float-slow" />
-          <span className="absolute left-[45%] top-[60%] h-12 w-12 rounded-full bg-[#E6C200] opacity-60 animate-float-medium" />
-          <span className="absolute right-[40%] top-[10%] h-14 w-14 rotate-45 bg-[#E6C200] opacity-40 animate-float-fast" />
-          <span className="absolute left-[5%] bottom-[40%] h-10 w-10 rounded-full bg-[#E6C200] opacity-50 animate-float-medium" />
-          <span className="absolute right-[5%] top-[55%] h-20 w-20 rounded-full bg-[#E6C200] opacity-40 animate-float-slow" />
-        </div>
-        <img
-          src={brqLogo}
-          alt="BRQ Frota Interna"
-          style={{ mixBlendMode: "multiply" }}
-          className="relative z-10 max-h-48 w-auto max-w-md object-contain md:max-h-[60vh]"
-        />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0f0f10] p-4">
+      {/* Animação de carros no fundo */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <svg
+          className="absolute top-[20%] left-0 h-16 w-32 animate-[car-drive_22s_linear_infinite] text-[#FFD700] opacity-[0.06]"
+          viewBox="0 0 120 50"
+          fill="currentColor"
+        >
+          <path d="M10,35 L15,20 Q18,15 25,15 L75,15 Q85,15 92,22 L108,28 Q115,30 115,35 L115,40 L100,40 A8,8 0 0,0 84,40 L36,40 A8,8 0 0,0 20,40 L10,40 Z" />
+          <circle cx="28" cy="40" r="6" />
+          <circle cx="92" cy="40" r="6" />
+        </svg>
+        <svg
+          className="absolute top-[55%] left-0 h-20 w-40 animate-[car-drive_30s_linear_infinite] text-[#FFD700] opacity-[0.06]"
+          style={{ animationDelay: "-8s" }}
+          viewBox="0 0 120 50"
+          fill="currentColor"
+        >
+          <path d="M10,35 L15,20 Q18,15 25,15 L75,15 Q85,15 92,22 L108,28 Q115,30 115,35 L115,40 L100,40 A8,8 0 0,0 84,40 L36,40 A8,8 0 0,0 20,40 L10,40 Z" />
+          <circle cx="28" cy="40" r="6" />
+          <circle cx="92" cy="40" r="6" />
+        </svg>
+        <svg
+          className="absolute top-[80%] left-0 h-14 w-28 animate-[car-drive_26s_linear_infinite] text-[#FFD700] opacity-[0.06]"
+          style={{ animationDelay: "-15s" }}
+          viewBox="0 0 120 50"
+          fill="currentColor"
+        >
+          <path d="M10,35 L15,20 Q18,15 25,15 L75,15 Q85,15 92,22 L108,28 Q115,30 115,35 L115,40 L100,40 A8,8 0 0,0 84,40 L36,40 A8,8 0 0,0 20,40 L10,40 Z" />
+          <circle cx="28" cy="40" r="6" />
+          <circle cx="92" cy="40" r="6" />
+        </svg>
       </div>
 
-      {/* Lado direito - Formulário (escuro) */}
-      <div className="flex flex-1 items-center justify-center bg-[#1a1a1a] p-6 md:w-[35%] md:p-10">
-        <div className="w-full max-w-sm">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white text-center">
-              {forgot ? "Recuperar senha" : "Acessar sistema"}
-            </h1>
-            <p className="mt-2 text-sm text-white/60 text-center">
-              {forgot
-                ? "Enviaremos um link para redefinir sua senha."
-                : "Entre com suas credenciais para continuar."}
-            </p>
+      {/* Card de login */}
+      <div
+        className="relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-[#1a1a1c] p-8 md:p-10"
+        style={{ boxShadow: "0 10px 40px -10px rgba(255, 215, 0, 0.18), 0 0 0 1px rgba(255, 215, 0, 0.05)" }}
+      >
+        {/* Logo */}
+        <div className="mb-6 flex justify-center">
+          <div className="rounded-xl bg-white px-4 py-3">
+            <img
+              src={brqLogo}
+              alt="BRQ Frota Interna"
+              style={{ mixBlendMode: "multiply" }}
+              className="h-16 w-auto object-contain"
+            />
           </div>
+        </div>
 
-          {forgot ? (
-            <form onSubmit={onForgot} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="fe" className="text-white/80">E-mail</Label>
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold text-white">
+            {forgot ? "Recuperar senha" : "Bem-vindo"}
+          </h1>
+          <p className="mt-2 text-sm text-white/60">
+            {forgot ? "Enviaremos um link para redefinir sua senha." : "Acesse sua conta"}
+          </p>
+        </div>
+
+        {forgot ? (
+          <form onSubmit={onForgot} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="fe" className="text-white/80">E-mail</Label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
                 <Input
                   id="fe"
                   type="email"
                   required
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
-                  className="border-white/10 bg-white/5 text-white placeholder:text-white/40"
+                  className="border-white/10 bg-white/5 pl-10 text-white placeholder:text-white/40"
                 />
               </div>
-              <Button
-                type="submit"
-                className="w-full bg-[#FFD600] font-semibold text-black hover:bg-[#FFC700]"
-                disabled={loading}
-              >
-                {loading ? "Enviando..." : "Enviar link"}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-white/70 hover:bg-white/5 hover:text-white"
-                onClick={() => setForgot(false)}
-              >
-                Voltar
-              </Button>
-            </form>
-          ) : (
-            <form onSubmit={onSignIn} className="space-y-4" noValidate>
-              <div className="space-y-1.5">
-                <Label htmlFor="se" className="text-white/80">E-mail</Label>
+            </div>
+            <Button
+              type="submit"
+              className="h-11 w-full rounded-xl bg-[#FFD700] font-bold text-black hover:bg-[#FFC700]"
+              disabled={loading}
+            >
+              {loading ? "Enviando..." : "Enviar link"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full text-white/70 hover:bg-white/5 hover:text-white"
+              onClick={() => setForgot(false)}
+            >
+              Voltar
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={onSignIn} className="space-y-4" noValidate>
+            <div className="space-y-1.5">
+              <Label htmlFor="se" className="text-white/80">E-mail</Label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
                 <Input
                   id="se"
                   name="email"
                   type="email"
                   required
-                  className="border-white/10 bg-white/5 text-white placeholder:text-white/40"
+                  placeholder="seu@email.com"
+                  className="border-white/10 bg-white/5 pl-10 text-white placeholder:text-white/40"
                   onBlur={(e) =>
                     setSigninErrors((s) => ({ ...s, email: validarEmail(e.target.value) ?? undefined }))
                   }
                 />
-                {signinErrors.email && <p className="text-xs text-destructive">{signinErrors.email}</p>}
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="sp" className="text-white/80">Senha</Label>
+              {signinErrors.email && <p className="text-xs text-destructive">{signinErrors.email}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="sp" className="text-white/80">Senha</Label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
                 <Input
                   id="sp"
                   name="password"
                   type="password"
                   required
                   minLength={6}
-                  className="border-white/10 bg-white/5 text-white placeholder:text-white/40"
+                  placeholder="••••••••"
+                  className="border-white/10 bg-white/5 pl-10 text-white placeholder:text-white/40"
                 />
-                {signinErrors.password && <p className="text-xs text-destructive">{signinErrors.password}</p>}
               </div>
-              <Button
-                type="submit"
-                className="w-full bg-[#FFD600] font-semibold text-black hover:bg-[#FFC700]"
-                disabled={loading}
-              >
-                {loading ? "Entrando..." : "Entrar"}
-              </Button>
-              <button
-                type="button"
-                className="block w-full text-center text-xs text-white/50 hover:text-white"
-                onClick={() => setForgot(true)}
-              >
-                Esqueceu a senha?
-              </button>
-              <p className="pt-2 text-center text-[11px] text-white/40">
-                Acesso restrito. Solicite seu cadastro ao administrador.
-              </p>
-            </form>
-          )}
+              {signinErrors.password && <p className="text-xs text-destructive">{signinErrors.password}</p>}
+            </div>
+            <Button
+              type="submit"
+              className="h-11 w-full rounded-xl bg-[#FFD700] font-bold text-black hover:bg-[#FFC700]"
+              disabled={loading}
+            >
+              {loading ? "Entrando..." : "Entrar"}
+            </Button>
+            <p className="pt-2 text-center text-[11px] text-white/40">
+              Acesso restrito. Solicite seu cadastro ao administrador.
+            </p>
+          </form>
+        )}
 
-          <p className="mt-8 text-center text-[11px] text-white/30">
-            <Link to="/setup" className="hover:text-white/60">​</Link>
-          </p>
-        </div>
+        <p className="mt-6 text-center text-[11px] text-white/30">
+          <Link to="/setup" className="hover:text-white/60">​</Link>
+        </p>
       </div>
     </div>
   );
