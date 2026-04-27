@@ -14,6 +14,19 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { differenceInDays, parseISO, format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 
+// Safe wrappers — never throw on null/invalid dates
+const safeParse = (d: string | null | undefined): Date | null => {
+  if (!d || typeof d !== "string") return null;
+  try {
+    const x = parseISO(d);
+    return isNaN(x.getTime()) ? null : x;
+  } catch { return null; }
+};
+const safeDiffDays = (d: string | null | undefined, ref: Date): number | null => {
+  const x = safeParse(d);
+  return x ? differenceInDays(ref, x) : null;
+};
+
 export default function Dashboard() {
   const { canSeeFinancial } = usePermissions();
   const money = (n: number) => canSeeFinancial() ? fmtBRL(n) : "🔒 ••••";
