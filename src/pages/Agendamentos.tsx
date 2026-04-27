@@ -344,15 +344,15 @@ export default function Agendamentos() {
                             {a.destino && <> • {a.destino}</>}
                           </p>
                         </div>
-             {(isAdmin || a.motorista_id === user?.id) && (
+{(isAdmin || a.motorista_id === perfil?.motorista_id) && (
   <div className="flex flex-wrap gap-2">
     {a.status === "agendado" && (
       <Button size="sm" variant="outline" onClick={() => iniciarUso(a)}>
         Iniciar uso
       </Button>
     )}
-    {a.status === "em_uso" && isAdmin && (
-      <Button className="bg-gradient-brand text-primary-foreground"
+    {a.status === "em_uso" && (
+      <Button size="sm" className="bg-gradient-brand text-primary-foreground"
         onClick={() => { setReturning(a); setRetForm({ km_retorno: v?.km_atual }); }}>
         <RotateCcw className="mr-1 h-3.5 w-3.5" />Registrar devolução
       </Button>
