@@ -1,27 +1,22 @@
 import { useState } from "react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
-import { Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { validarEmail } from "@/lib/validators";
+import brqLogo from "@/assets/brq-logo-yellow.jpeg";
 
 export default function Auth() {
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn } = useAuth();
   const nav = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [forgot, setForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
-
-  // Estados de validação ao vivo
   const [signinErrors, setSigninErrors] = useState<{ email?: string; password?: string }>({});
-  const [signupErrors, setSignupErrors] = useState<{ email?: string; password?: string; nome?: string }>({});
 
   if (!isSupabaseConfigured) return <Navigate to="/setup" replace />;
   if (user) return <Navigate to="/" replace />;
@@ -31,34 +26,17 @@ export default function Auth() {
     const fd = new FormData(e.currentTarget);
     const email = String(fd.get("email"));
     const password = String(fd.get("password"));
-    const errs = { email: validarEmail(email) ?? undefined, password: password.length < 6 ? "Senha mínima 6 caracteres" : undefined };
-    setSigninErrors(errs as any);
+    const errs = {
+      email: validarEmail(email) ?? undefined,
+      password: password.length < 6 ? "Senha mínima 6 caracteres" : undefined,
+    };
+    setSigninErrors(errs);
     if (errs.email || errs.password) return;
     setLoading(true);
     const { error } = await signIn(email, password);
     setLoading(false);
     if (error) toast({ title: "Erro ao entrar", description: error, variant: "destructive" });
     else { toast({ title: "Bem-vindo!" }); nav("/"); }
-  };
-
-  const onSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const nome = String(fd.get("nome")).trim();
-    const email = String(fd.get("email"));
-    const password = String(fd.get("password"));
-    const errs = {
-      nome: nome.length < 2 ? "Informe seu nome" : undefined,
-      email: validarEmail(email) ?? undefined,
-      password: password.length < 6 ? "Senha mínima 6 caracteres" : undefined,
-    };
-    setSignupErrors(errs as any);
-    if (errs.nome || errs.email || errs.password) return;
-    setLoading(true);
-    const { error } = await signUp(email, password, nome);
-    setLoading(false);
-    if (error) toast({ title: "Erro ao criar conta", description: error, variant: "destructive" });
-    else toast({ title: "Conta criada", description: "Verifique seu e-mail caso a confirmação esteja ativa, depois faça login." });
   };
 
   const onForgot = async (e: React.FormEvent) => {
@@ -74,94 +52,111 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-dark p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-6 flex items-center justify-center gap-3 text-white">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-brand shadow-elevated">
-            <Truck className="h-6 w-6" />
+    <div className="flex min-h-screen flex-col md:flex-row">
+      {/* Lado esquerdo - Logo (amarelo) */}
+      <div className="flex items-center justify-center bg-[#FFD600] p-8 md:w-[65%] md:p-12">
+        <img
+          src={brqLogo}
+          alt="BRQ Frota Interna"
+          className="max-h-48 w-auto max-w-md object-contain md:max-h-[60vh]"
+        />
+      </div>
+
+      {/* Lado direito - Formulário (escuro) */}
+      <div className="flex flex-1 items-center justify-center bg-[#1a1a1a] p-6 md:w-[35%] md:p-10">
+        <div className="w-full max-w-sm">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-white">
+              {forgot ? "Recuperar senha" : "Acessar sistema"}
+            </h1>
+            <p className="mt-2 text-sm text-white/60">
+              {forgot
+                ? "Enviaremos um link para redefinir sua senha."
+                : "Entre com suas credenciais para continuar."}
+            </p>
           </div>
-          <div className="text-left">
-            <h1 className="text-xl font-bold">BRQ - FROTA INTERNA</h1>
-            <p className="text-xs text-white/60">Gestão de frota corporativa BRQ</p>
-          </div>
+
+          {forgot ? (
+            <form onSubmit={onForgot} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="fe" className="text-white/80">E-mail</Label>
+                <Input
+                  id="fe"
+                  type="email"
+                  required
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  className="border-white/10 bg-white/5 text-white placeholder:text-white/40"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-[#FFD600] font-semibold text-black hover:bg-[#FFC700]"
+                disabled={loading}
+              >
+                {loading ? "Enviando..." : "Enviar link"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-white/70 hover:bg-white/5 hover:text-white"
+                onClick={() => setForgot(false)}
+              >
+                Voltar
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={onSignIn} className="space-y-4" noValidate>
+              <div className="space-y-1.5">
+                <Label htmlFor="se" className="text-white/80">E-mail</Label>
+                <Input
+                  id="se"
+                  name="email"
+                  type="email"
+                  required
+                  className="border-white/10 bg-white/5 text-white placeholder:text-white/40"
+                  onBlur={(e) =>
+                    setSigninErrors((s) => ({ ...s, email: validarEmail(e.target.value) ?? undefined }))
+                  }
+                />
+                {signinErrors.email && <p className="text-xs text-destructive">{signinErrors.email}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="sp" className="text-white/80">Senha</Label>
+                <Input
+                  id="sp"
+                  name="password"
+                  type="password"
+                  required
+                  minLength={6}
+                  className="border-white/10 bg-white/5 text-white placeholder:text-white/40"
+                />
+                {signinErrors.password && <p className="text-xs text-destructive">{signinErrors.password}</p>}
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-[#FFD600] font-semibold text-black hover:bg-[#FFC700]"
+                disabled={loading}
+              >
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+              <button
+                type="button"
+                className="block w-full text-center text-xs text-white/50 hover:text-white"
+                onClick={() => setForgot(true)}
+              >
+                Esqueceu a senha?
+              </button>
+              <p className="pt-2 text-center text-[11px] text-white/40">
+                Acesso restrito. Solicite seu cadastro ao administrador.
+              </p>
+            </form>
+          )}
+
+          <p className="mt-8 text-center text-[11px] text-white/30">
+            <Link to="/setup" className="hover:text-white/60">Configurações de conexão</Link>
+          </p>
         </div>
-        <Card className="shadow-elevated">
-          <CardHeader>
-            <CardTitle>{forgot ? "Recuperar senha" : "Acesso"}</CardTitle>
-            <CardDescription>
-              {forgot ? "Enviaremos um link para redefinir sua senha." : "Entre ou crie sua conta para continuar."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {forgot ? (
-              <form onSubmit={onForgot} className="space-y-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="fe">E-mail</Label>
-                  <Input id="fe" type="email" required value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} />
-                </div>
-                <Button type="submit" className="w-full bg-gradient-brand text-primary-foreground" disabled={loading}>
-                  {loading ? "Enviando..." : "Enviar link"}
-                </Button>
-                <Button type="button" variant="ghost" className="w-full" onClick={() => setForgot(false)}>Voltar</Button>
-              </form>
-            ) : (
-              <Tabs defaultValue="signin">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="signin">Entrar</TabsTrigger>
-                  <TabsTrigger value="signup">Criar conta</TabsTrigger>
-                </TabsList>
-                <TabsContent value="signin">
-                  <form onSubmit={onSignIn} className="space-y-3 pt-3" noValidate>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="se">E-mail</Label>
-                      <Input id="se" name="email" type="email" required onBlur={(e) => setSigninErrors(s => ({ ...s, email: validarEmail(e.target.value) ?? undefined }))} />
-                      {signinErrors.email && <p className="text-xs text-destructive">{signinErrors.email}</p>}
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="sp">Senha</Label>
-                      <Input id="sp" name="password" type="password" required minLength={6} />
-                      {signinErrors.password && <p className="text-xs text-destructive">{signinErrors.password}</p>}
-                    </div>
-                    <Button type="submit" className="w-full bg-gradient-brand text-primary-foreground" disabled={loading}>
-                      {loading ? "Entrando..." : "Entrar"}
-                    </Button>
-                    <button type="button" className="block w-full text-center text-xs text-muted-foreground hover:text-foreground" onClick={() => setForgot(true)}>
-                      Esqueceu a senha?
-                    </button>
-                  </form>
-                </TabsContent>
-                <TabsContent value="signup">
-                  <form onSubmit={onSignUp} className="space-y-3 pt-3" noValidate>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="un">Nome</Label>
-                      <Input id="un" name="nome" required onBlur={(e) => setSignupErrors(s => ({ ...s, nome: e.target.value.trim().length < 2 ? "Informe seu nome" : undefined }))} />
-                      {signupErrors.nome && <p className="text-xs text-destructive">{signupErrors.nome}</p>}
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="ue">E-mail</Label>
-                      <Input id="ue" name="email" type="email" required onBlur={(e) => setSignupErrors(s => ({ ...s, email: validarEmail(e.target.value) ?? undefined }))} />
-                      {signupErrors.email && <p className="text-xs text-destructive">{signupErrors.email}</p>}
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="up">Senha</Label>
-                      <Input id="up" name="password" type="password" required minLength={6} />
-                      {signupErrors.password && <p className="text-xs text-destructive">{signupErrors.password}</p>}
-                    </div>
-                    <Button type="submit" className="w-full bg-gradient-brand text-primary-foreground" disabled={loading}>
-                      {loading ? "Criando..." : "Criar conta"}
-                    </Button>
-                    <p className="text-center text-[11px] text-muted-foreground">
-                      Novas contas iniciam como <strong>motorista</strong>. Um admin pode promover seu papel.
-                    </p>
-                  </form>
-                </TabsContent>
-              </Tabs>
-            )}
-          </CardContent>
-        </Card>
-        <p className="mt-4 text-center text-xs text-white/50">
-          <Link to="/setup" className="hover:text-white">Configurações de conexão</Link>
-        </p>
       </div>
     </div>
   );
