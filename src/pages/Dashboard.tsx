@@ -159,6 +159,7 @@ export default function Dashboard() {
         <KpiCard label="Veículos cadastrados" value={veiculos.length} icon={Car} />
       </div>
 
+      <ErrorBoundary fallback={<div className="mt-6 rounded-lg border border-border bg-muted/30 p-6 text-sm text-muted-foreground">Não foi possível carregar os gráficos.</div>}>
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="shadow-card lg:col-span-2">
           <CardHeader><CardTitle className="text-base">Gastos mensais (últimos 6 meses)</CardTitle></CardHeader>
