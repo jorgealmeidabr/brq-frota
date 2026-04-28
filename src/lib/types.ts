@@ -14,7 +14,7 @@ export type TipoConta = "admin" | "usuario";
 export type ModuloPermissao =
   | "dashboard" | "veiculos" | "motoristas" | "manutencao" | "abastecimento"
   | "agendamentos" | "checklists" | "multas" | "alertas" | "historico"
-  | "usuarios" | "financeiro";
+  | "usuarios" | "financeiro" | "solicitacoes";
 
 export type Permissoes = Record<ModuloPermissao, boolean>;
 
@@ -22,12 +22,14 @@ export const PERMISSOES_DEFAULT: Permissoes = {
   dashboard: false, veiculos: false, motoristas: false, manutencao: false,
   abastecimento: false, agendamentos: true, checklists: true, multas: false,
   alertas: false, historico: false, usuarios: false, financeiro: false,
+  solicitacoes: true,
 };
 
 export const PERMISSOES_TUDO: Permissoes = {
   dashboard: true, veiculos: true, motoristas: true, manutencao: true,
   abastecimento: true, agendamentos: true, checklists: true, multas: true,
   alertas: true, historico: true, usuarios: true, financeiro: true,
+  solicitacoes: true,
 };
 
 export interface Veiculo { id: string; placa: string; modelo: string; marca: string; ano: number; tipo: VeiculoTipo; combustivel: VeiculoCombustivel; km_atual: number; status: VeiculoStatus; foto_url: string | null; created_at: string; }
