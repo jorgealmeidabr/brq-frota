@@ -40,7 +40,7 @@ const items: NavItem[] = [
   { title: "Usuários",      url: "/usuarios",      icon: ShieldCheck,     perm: "usuarios" },
 ];
 
-function AppSidebar({ alertCount }: { alertCount: number }) {
+function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestCount: number }) {
   const { state } = useSidebar();
   const location = useLocation();
   const { canSee } = usePermissions();
@@ -71,7 +71,12 @@ function AppSidebar({ alertCount }: { alertCount: number }) {
             <SidebarMenu>
               {visible.map(item => {
                 const active = item.url === "/" ? location.pathname === "/" : location.pathname.startsWith(item.url);
-                const showBadge = item.url === "/alertas" && alertCount > 0;
+                const badgeValue =
+                  item.url === "/alertas" ? alertCount :
+                  item.url === "/solicitacoes" ? requestCount : 0;
+                const badgeVariant: "destructive" | "default" =
+                  item.url === "/alertas" ? "destructive" : "default";
+                const showBadge = badgeValue > 0;
                 return (
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton asChild isActive={active}>
@@ -79,11 +84,12 @@ function AppSidebar({ alertCount }: { alertCount: number }) {
                         <item.icon className="h-4 w-4" />
                         {!collapsed && <span className="flex-1">{item.title}</span>}
                         {showBadge && (
-                          <Badge variant="destructive" className={cn(
+                          <Badge variant={badgeVariant} className={cn(
                             "h-5 min-w-[20px] justify-center px-1.5 text-[10px]",
+                            item.url === "/solicitacoes" && "bg-info text-info-foreground hover:bg-info",
                             collapsed && "absolute right-0 top-0 -translate-y-1 translate-x-1",
                           )}>
-                            {alertCount}
+                            {badgeValue}
                           </Badge>
                         )}
                       </NavLink>
