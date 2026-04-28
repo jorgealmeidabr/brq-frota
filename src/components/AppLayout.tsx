@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2 } from "lucide-react";
+import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText } from "lucide-react";
 import brqLogo from "@/assets/brq-logo.jpg";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -12,6 +12,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlerts } from "@/hooks/useAlerts";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useRequestBadge } from "@/hooks/useRequestBadge";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { cn } from "@/lib/utils";
@@ -32,6 +33,7 @@ const items: NavItem[] = [
   { title: "Abastecimento", url: "/abastecimentos", icon: Fuel,           perm: "abastecimento" },
   { title: "Agendamentos",  url: "/agendamentos",  icon: CalendarRange,   perm: "agendamentos" },
   { title: "Checklists",    url: "/checklists",    icon: ClipboardCheck,  perm: "checklists" },
+  { title: "Solicitações",  url: "/solicitacoes",  icon: FileText,        perm: "solicitacoes" },
   { title: "Multas",        url: "/multas",        icon: AlertTriangle,   perm: "multas" },
   { title: "Histórico",     url: "/historico",     icon: History,         perm: "historico" },
   { title: "Alertas",       url: "/alertas",       icon: Bell,            perm: "alertas" },
