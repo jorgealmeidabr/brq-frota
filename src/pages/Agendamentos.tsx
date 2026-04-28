@@ -312,7 +312,7 @@ useEffect(() => {
                 <p className="text-muted-foreground">Nenhum veículo cadastrado.</p>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {veiculos.map(v => {
+                  {veiculosEfetivos.map(v => {
                     const disponivel = v.status === "disponivel";
                     const motivo =
                       v.status === "manutencao" ? "Em manutenção" :
