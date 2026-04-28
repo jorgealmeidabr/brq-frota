@@ -93,6 +93,21 @@ useEffect(() => {
     [rows]
   );
 
+  // IDs de veículos com agendamento ativo (fonte de verdade client-side)
+  const veiculosOcupados = useMemo(
+    () => new Set(ativos.map(a => a.veiculo_id)),
+    [ativos]
+  );
+
+  // Lista de veículos com status efetivo (reservado se houver agendamento ativo)
+  const veiculosEfetivos = useMemo<Veiculo[]>(
+    () => veiculos.map(v => {
+      if (v.status === "manutencao" || v.status === "inativo") return v;
+      return veiculosOcupados.has(v.id) ? { ...v, status: "reservado" as Veiculo["status"] } : v;
+    }),
+    [veiculos, veiculosOcupados]
+  );
+
   const eventosNoDia = useMemo(() => {
     if (!selectedDay) return [];
     return ativos.filter(a => inRange(selectedDay, a.data_saida, a.data_retorno_prevista));
@@ -297,7 +312,7 @@ useEffect(() => {
                 <p className="text-muted-foreground">Nenhum veículo cadastrado.</p>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {veiculos.map(v => {
+                  {veiculosEfetivos.map(v => {
                     const disponivel = v.status === "disponivel";
                     const motivo =
                       v.status === "manutencao" ? "Em manutenção" :
@@ -382,7 +397,7 @@ useEffect(() => {
       <RotateCcw className="mr-1 h-3.5 w-3.5" />Registrar devolução
     </Button>
   )}
-  {isAdmin && (
+  {a.status === "agendado" && a.motorista_id === perfil?.motorista_id && (
     <Button size="sm" variant="ghost" onClick={() => cancelar(a)}>Cancelar</Button>
   )}
 </div>
