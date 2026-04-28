@@ -38,16 +38,18 @@ export default function Dashboard() {
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
   const [checklists, setChecklists] = useState<Checklist[]>([]);
   const [multas, setMultas] = useState<Multa[]>([]);
+  const [ocupados, setOcupados] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     (async () => {
-      const [v, m, a, mo, c, mu] = await Promise.all([
+      const [v, m, a, mo, c, mu, ag] = await Promise.all([
         supabase.from("veiculos").select("*"),
         supabase.from("manutencoes").select("*"),
         supabase.from("abastecimentos").select("*"),
         supabase.from("motoristas").select("*"),
         supabase.from("checklists").select("*"),
         supabase.from("multas").select("*"),
+        supabase.from("agendamentos").select("veiculo_id,status").in("status", ["agendado", "em_uso"]),
       ]);
       setVeiculos((v.data ?? []) as Veiculo[]);
       setManutencoes((m.data ?? []) as Manutencao[]);
@@ -55,14 +57,20 @@ export default function Dashboard() {
       setMotoristas((mo.data ?? []) as Motorista[]);
       setChecklists((c.data ?? []) as Checklist[]);
       setMultas((mu.data ?? []) as Multa[]);
+      setOcupados(new Set(((ag.data ?? []) as Array<{ veiculo_id: string }>).map(x => x.veiculo_id)));
       setLoading(false);
     })();
   }, []);
 
+  // Status efetivo: agendamento ativo sobrescreve "disponivel" para "reservado"
+  const statusEfetivo = (v: Veiculo) =>
+    (v.status === "manutencao" || v.status === "inativo") ? v.status
+      : (ocupados.has(v.id) ? "reservado" : v.status);
+
   // KPIs
-  const disponiveis = veiculos.filter(v => v.status === "disponivel").length;
-  const emManutencao = veiculos.filter(v => v.status === "manutencao").length;
-  const inativos = veiculos.filter(v => v.status === "inativo").length;
+  const disponiveis = veiculos.filter(v => statusEfetivo(v) === "disponivel").length;
+  const emManutencao = veiculos.filter(v => statusEfetivo(v) === "manutencao").length;
+  const inativos = veiculos.filter(v => statusEfetivo(v) === "inativo").length;
 
   const now = new Date();
   const ini = startOfMonth(now), fim = endOfMonth(now);
