@@ -36,7 +36,7 @@ export default function PendingApproval({ status }: { status: "pendente" | "reje
 
           <button
             onClick={() => signOut()}
-            className="mt-2 inline-flex items-center justify-center w-full h-11 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 font-semibold text-sm transition"
+            className="mt-2 inline-flex items-center justify-center w-full h-11 rounded-lg bg-blue-500 hover:bg-blue-600 text-zinc-950 font-semibold text-sm transition"
           >
             Sair
           </button>

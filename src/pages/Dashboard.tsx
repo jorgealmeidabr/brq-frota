@@ -229,7 +229,7 @@ export default function Dashboard() {
               {custosVeic.length === 0 && <p className="text-sm text-muted-foreground">Sem dados.</p>}
               {custosVeic.map((v, i) => (
                 <div key={v.id} className="flex items-center gap-3 rounded-lg border border-border p-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-brand text-sm font-bold text-primary-foreground bg-amber-500">{i + 1}</div>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-brand text-sm font-bold text-primary-foreground bg-blue-500">{i + 1}</div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">{v.placa} – {v.marca} {v.modelo}</p>
                     <p className="text-xs text-muted-foreground">{v.km_atual.toLocaleString("pt-BR")} km</p>
@@ -273,7 +273,7 @@ export default function Dashboard() {
                     const cls = it.pendente || it.dias < 0
                       ? "bg-red-500/15 text-red-400 border-red-500/30"
                       : it.dias <= 30
-                        ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                        ? "bg-blue-500/15 text-blue-400 border-blue-500/30"
                         : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30";
                     const label = it.pendente ? "Pendente" : it.dias < 0 ? `Vencido há ${Math.abs(it.dias)}d` : `${it.dias}d restantes`;
                     return (
@@ -332,7 +332,7 @@ export default function Dashboard() {
                     const critico = (it.kmRest != null && it.kmRest <= 0) || (it.diasRest != null && it.diasRest <= 0);
                     const cls = critico
                       ? "bg-red-500/15 text-red-400 border-red-500/30"
-                      : "bg-amber-500/15 text-amber-400 border-amber-500/30";
+                      : "bg-blue-500/15 text-blue-400 border-blue-500/30";
                     const partes: string[] = [];
                     if (it.kmRest != null) partes.push(it.kmRest <= 0 ? `${Math.abs(it.kmRest)} km vencido` : `${fmtNumber(it.kmRest)} km restantes`);
                     if (it.diasRest != null) partes.push(it.diasRest <= 0 ? `${Math.abs(it.diasRest)}d vencido` : `${it.diasRest}d restantes`);

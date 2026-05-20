@@ -21,17 +21,17 @@ export function DigitalClock() {
 
   return (
     <div
-      className="flex flex-col items-end rounded-md border px-2 py-1 font-mono leading-none border-amber-400"
+      className="flex flex-col items-end rounded-md border px-2 py-1 font-mono leading-none border-blue-400"
       style={{ backgroundColor: "#111" }}
       aria-label="Relógio digital"
     >
-      <div className="flex items-baseline gap-1 text-amber-500">
-        <span style={{ fontSize: "22px" }} className="font-bold tabular-nums text-amber-400">
+      <div className="flex items-baseline gap-1 text-blue-500">
+        <span style={{ fontSize: "22px" }} className="font-bold tabular-nums text-blue-400">
           {hh}:{mm}
         </span>
-        <span className="text-xs tabular-nums text-amber-400">{ss}</span>
+        <span className="text-xs tabular-nums text-blue-400">{ss}</span>
       </div>
-      <span className="mt-0.5 text-[10px] uppercase tracking-wider text-amber-400">
+      <span className="mt-0.5 text-[10px] uppercase tracking-wider text-blue-400">
         {dataStr}
       </span>
     </div>

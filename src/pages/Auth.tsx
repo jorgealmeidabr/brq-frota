@@ -278,7 +278,7 @@ export default function Auth() {
 
               <p className="brq-note">
                 Não tem conta?{" "}
-                <a href="/cadastro" className="text-amber-500 hover:text-amber-400 font-medium">
+                <a href="/cadastro" className="text-blue-500 hover:text-blue-400 font-medium">
                   Solicitar cadastro
                 </a>
               </p>
