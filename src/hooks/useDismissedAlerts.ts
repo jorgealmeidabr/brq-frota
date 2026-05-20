@@ -1,71 +1,80 @@
-// Persistência local dos alertas dispensados pelo usuário.
-// Como os alertas são derivados dinamicamente (CNH, manutenção, multas, etc.),
-// não há tabela para deletá-los. Guardamos os IDs dispensados em localStorage
-// para ocultá-los das listagens e dos contadores até que um alerta novo
-// (com ID novo) seja gerado.
+// Persistência DB dos alertas dispensados (tabela alerts_dismissed).
+// Mantém a mesma interface anterior (isDismissed, dismiss, dismissMany,
+// restore, clearAll) para compatibilidade com o código existente.
 import { useCallback, useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
-const STORAGE_KEY = "brq:dismissed-alerts:v1";
 const EVENT_NAME = "brq:dismissed-alerts:changed";
 
-function readSet(): Set<string> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return new Set();
-    const arr = JSON.parse(raw);
-    return new Set(Array.isArray(arr) ? arr : []);
-  } catch {
-    return new Set();
-  }
-}
-
-function writeSet(set: Set<string>) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
-    window.dispatchEvent(new Event(EVENT_NAME));
-  } catch {
-    /* ignora */
-  }
-}
-
 export function useDismissedAlerts() {
-  const [dismissed, setDismissed] = useState<Set<string>>(() => readSet());
+  const { user } = useAuth();
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+
+  const reload = useCallback(async () => {
+    if (!user?.id) { setDismissed(new Set()); return; }
+    const { data } = await (supabase as any)
+      .from("alerts_dismissed")
+      .select("alert_key")
+      .eq("user_id", user.id);
+    setDismissed(new Set((data ?? []).map((r: any) => r.alert_key)));
+  }, [user?.id]);
+
+  useEffect(() => { reload(); }, [reload]);
 
   useEffect(() => {
-    const sync = () => setDismissed(readSet());
+    const sync = () => reload();
     window.addEventListener(EVENT_NAME, sync);
-    window.addEventListener("storage", sync);
-    return () => {
-      window.removeEventListener(EVENT_NAME, sync);
-      window.removeEventListener("storage", sync);
-    };
-  }, []);
+    return () => window.removeEventListener(EVENT_NAME, sync);
+  }, [reload]);
 
-  const dismiss = useCallback((id: string) => {
-    const next = readSet();
-    next.add(id);
-    writeSet(next);
-  }, []);
+  const dismiss = useCallback(async (id: string) => {
+    if (!user?.id) return;
+    setDismissed(prev => new Set(prev).add(id)); // otimista
+    const { error } = await (supabase as any)
+      .from("alerts_dismissed")
+      .upsert({ user_id: user.id, alert_key: id }, { onConflict: "user_id,alert_key" });
+    if (error) await reload();
+    window.dispatchEvent(new Event(EVENT_NAME));
+  }, [user?.id, reload]);
 
-  const dismissMany = useCallback((ids: string[]) => {
-    const next = readSet();
-    ids.forEach((id) => next.add(id));
-    writeSet(next);
-  }, []);
+  const dismissMany = useCallback(async (ids: string[]) => {
+    if (!user?.id || ids.length === 0) return;
+    setDismissed(prev => { const n = new Set(prev); ids.forEach(i => n.add(i)); return n; });
+    const rows = ids.map(alert_key => ({ user_id: user.id, alert_key }));
+    const { error } = await (supabase as any)
+      .from("alerts_dismissed")
+      .upsert(rows, { onConflict: "user_id,alert_key" });
+    if (error) await reload();
+    window.dispatchEvent(new Event(EVENT_NAME));
+  }, [user?.id, reload]);
 
-  const restore = useCallback((id: string) => {
-    const next = readSet();
-    next.delete(id);
-    writeSet(next);
-  }, []);
+  const restore = useCallback(async (id: string) => {
+    if (!user?.id) return;
+    setDismissed(prev => { const n = new Set(prev); n.delete(id); return n; });
+    const { error } = await (supabase as any)
+      .from("alerts_dismissed")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("alert_key", id);
+    if (error) await reload();
+    window.dispatchEvent(new Event(EVENT_NAME));
+  }, [user?.id, reload]);
 
-  const clearAll = useCallback(() => {
-    writeSet(new Set());
-  }, []);
+  const clearAll = useCallback(async () => {
+    if (!user?.id) return;
+    setDismissed(new Set());
+    const { error } = await (supabase as any)
+      .from("alerts_dismissed")
+      .delete()
+      .eq("user_id", user.id);
+    if (error) await reload();
+    window.dispatchEvent(new Event(EVENT_NAME));
+  }, [user?.id, reload]);
 
   const isDismissed = useCallback(
     (id: string) => dismissed.has(id),
-    [dismissed]
+    [dismissed],
   );
 
   return { dismissed, isDismissed, dismiss, dismissMany, restore, clearAll };
