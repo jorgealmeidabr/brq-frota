@@ -74,7 +74,7 @@ const fields: FieldDef[] = [
 
 export default function Veiculos() {
   const navigate = useNavigate();
-  const { rows, loading, insert, update } = useTable<Veiculo>("veiculos");
+  const { rows, loading, insert, update } = useTable<Veiculo>("veiculos", { audit: true });
   const { isAdmin, perfil } = useAuth();
   const [cnhUsuario, setCnhUsuario] = useState<string | null>(null);
   useEffect(() => {

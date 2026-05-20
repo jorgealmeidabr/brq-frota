@@ -29,6 +29,7 @@ import Usuarios from "./pages/Usuarios";
 import MeuPerfil from "./pages/MeuPerfil";
 import Solicitacoes from "./pages/Solicitacoes";
 import Acidentes from "./pages/Acidentes";
+import Financeiro from "./pages/Financeiro";
 import AcidenteDetalhe from "./pages/AcidenteDetalhe";
 import NotFound from "./pages/NotFound";
 import type { ModuloPermissao } from "@/lib/types";
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/checklists" element={<Protected perm="checklists"><Checklists /></Protected>} />
             <Route path="/multas" element={<Protected perm="multas"><Multas /></Protected>} />
             <Route path="/historico" element={<Protected perm="historico"><Historico /></Protected>} />
+            <Route path="/financeiro" element={<Protected perm="financeiro"><Financeiro /></Protected>} />
             <Route path="/alertas" element={<Protected perm="alertas"><Alertas /></Protected>} />
             <Route path="/solicitacoes" element={<Protected perm="solicitacoes"><Solicitacoes /></Protected>} />
             <Route path="/acidentes" element={<Protected perm="acidentes"><Acidentes /></Protected>} />

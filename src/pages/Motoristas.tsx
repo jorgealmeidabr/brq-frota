@@ -44,7 +44,7 @@ function diasRestantes(validade: string): number {
 
 export default function Motoristas() {
   const navigate = useNavigate();
-  const { rows, loading, insert, update } = useTable<Motorista>("motoristas");
+  const { rows, loading, insert, update } = useTable<Motorista>("motoristas", { audit: true });
   const { isAdmin } = useAuth();
   const [editing, setEditing] = useState<Motorista | null>(null);
   const [busca, setBusca] = useState("");

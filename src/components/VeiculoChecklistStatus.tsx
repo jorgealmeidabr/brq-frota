@@ -75,9 +75,8 @@ export function VeiculoChecklistStatus({ veiculoId }: { veiculoId: string }) {
   const nivel = (nivelMatch?.[1]?.toLowerCase() as FuelLevel | undefined) ?? null;
   const fuel = nivel ? FUEL_INFO[nivel] : null;
 
-  // "Limpadores" e "Veículo limpo" não são persistidos como colunas próprias
-  // no banco. Como o checklist marca status global "ok"/"problema" quando todos
-  // os itens da UI estão OK, refletimos esse estado para esses dois campos.
+  const itens = Array.isArray((checklist as any).itens) ? (checklist as any).itens as Array<{ nome: string; status: string }> : [];
+  const problemas = itens.filter(i => i.status === "problema");
   const okGlobal = checklist.status === "ok";
 
   return (
@@ -89,12 +88,30 @@ export function VeiculoChecklistStatus({ veiculoId }: { veiculoId: string }) {
         </span>
         <span className="text-xs text-muted-foreground">{fmtDate(checklist.data)}</span>
       </div>
-      <div className="grid gap-2 sm:grid-cols-2">
-        <Item label="Pneus" ok={checklist.pneus_ok} />
-        <Item label="Faróis e lanternas" ok={checklist.luzes_ok} />
-        <Item label="Limpadores de para-brisa" ok={okGlobal} />
-        <Item label="Veículo limpo" ok={okGlobal} />
-        <div className="flex items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-sm sm:col-span-2">
+
+      {itens.length > 0 ? (
+        problemas.length === 0 ? (
+          <div className="rounded-md border border-success/30 bg-success/10 px-3 py-2 text-sm text-success inline-flex items-center gap-2">
+            <Check className="h-4 w-4" /> Todos os itens verificados estão OK.
+          </div>
+        ) : (
+          <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3">
+            <p className="text-sm font-semibold text-destructive mb-1">Itens com problema:</p>
+            <ul className="text-sm text-destructive list-disc pl-5">
+              {problemas.map((p, i) => <li key={i}>{p.nome}</li>)}
+            </ul>
+          </div>
+        )
+      ) : (
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Item label="Pneus" ok={checklist.pneus_ok} />
+          <Item label="Faróis e lanternas" ok={checklist.luzes_ok} />
+          <Item label="Limpadores de para-brisa" ok={okGlobal} />
+          <Item label="Veículo limpo" ok={okGlobal} />
+        </div>
+      )}
+
+      <div className="flex items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-sm">
           <span className="text-muted-foreground">Nível de combustível</span>
           {fuel ? (
             <span className={cn("inline-flex items-center gap-1 font-medium", fuel.cls)}>
@@ -106,7 +123,6 @@ export function VeiculoChecklistStatus({ veiculoId }: { veiculoId: string }) {
               {checklist.combustivel_ok ? "OK" : "Baixo"}
             </span>
           )}
-        </div>
       </div>
     </div>
   );

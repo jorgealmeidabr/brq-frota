@@ -13,7 +13,7 @@ export type AgendamentoStatus = "ativo" | "cancelado" | "agendado" | "em_uso" | 
 export type MultaStatus = "pendente" | "pago" | "contestado";
 export type RequestType = "maintenance" | "fuel";
 export type RequestUrgency = "low" | "medium" | "high";
-export type RequestStatus = "requested" | "pending" | "completed";
+export type RequestStatus = "requested" | "pending" | "approved" | "rejected" | "completed";
 export type AppRole = "admin" | "motorista";
 export type TipoConta = "admin" | "usuario";
 
@@ -109,7 +109,7 @@ export interface Manutencao {
   pecas?: ManutencaoPeca[] | null;
 }
 export interface Abastecimento { id: string; veiculo_id: string; motorista_id: string | null; data: string; km_atual: number; litros: number; valor_total: number; posto: string | null; consumo_km_l: number | null; custo_por_km: number | null; created_at: string; }
-export interface Checklist { id: string; veiculo_id: string; motorista_id: string | null; data: string; pneus_ok: boolean; luzes_ok: boolean; combustivel_ok: boolean; nivel_oleo_ok: boolean; observacoes: string | null; fotos_urls: string[] | null; status: ChecklistStatus; created_at: string; }
+export interface Checklist { id: string; veiculo_id: string; motorista_id: string | null; data: string; pneus_ok: boolean; luzes_ok: boolean; combustivel_ok: boolean; nivel_oleo_ok: boolean; observacoes: string | null; fotos_urls: string[] | null; status: ChecklistStatus; created_at: string; itens?: Array<{ nome: string; status: "ok" | "problema" | "nao_verificado" }> | null; }
 export interface Agendamento { id: string; veiculo_id: string; motorista_id: string; data_saida: string; data_retorno_prevista: string; data_retorno_real: string | null; destino: string | null; km_saida: number | null; km_retorno: number | null; status: AgendamentoStatus; observacoes: string | null; created_at: string; }
 export interface Multa { id: string; veiculo_id: string; motorista_id: string | null; data_infracao: string; tipo_infracao: string; valor: number; pontos_cnh: number; status_pagamento: MultaStatus; auto_infracao: string | null; created_at: string; }
 export interface UsuarioPerfil { id: string; user_id: string; motorista_id: string; tipo_conta: TipoConta; permissoes: Permissoes; ativo: boolean; must_change_password: boolean; created_at: string; last_login: string | null; }
@@ -128,6 +128,9 @@ export interface Request {
   status: RequestStatus;
   pdf_url: string | null;
   created_at: string;
+  aprovado_por?: string | null;
+  aprovado_em?: string | null;
+  rejeitado_motivo?: string | null;
 }
 
 // Stub minimal de Database para o supabase-js

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown, DollarSign } from "lucide-react";
 import brqLogo from "@/assets/brq-logo-app.png";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -44,6 +44,7 @@ const groups: NavGroup[] = [
       { title: "Pessoas",      url: "/motoristas",   icon: Users,           perm: "motoristas" },
       { title: "Solicitações", url: "/solicitacoes", icon: FileText,        perm: "solicitacoes" },
       { title: "Histórico",    url: "/historico",    icon: History,         perm: "historico" },
+      { title: "Financeiro",   url: "/financeiro",   icon: DollarSign,      perm: "financeiro" },
       { title: "Multas",       url: "/multas",       icon: AlertTriangle,   perm: "multas" },
       { title: "Usuários",     url: "/usuarios",     icon: ShieldCheck,     perm: "usuarios" },
     ],
