@@ -10,7 +10,7 @@ import { supabase } from "@/lib/supabase";
 import { fmtDateTime } from "@/lib/format";
 import type { Acidente, AcidenteStatus, Veiculo } from "@/lib/types";
 import { ArrowLeft, Printer } from "lucide-react";
-import brqLogo from "@/assets/brq-logo-app.jpg";
+import brqLogo from "@/assets/brq-logo-app.png";
 
 const TIPO_LABEL: Record<string, string> = {
   colisao: "Colisão", atropelamento: "Atropelamento",
