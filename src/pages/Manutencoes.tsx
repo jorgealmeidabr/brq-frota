@@ -36,7 +36,7 @@ const PRIO_BADGE: Record<string, string> = {
 };
 
 export default function Manutencoes() {
-  const { rows, loading, insert, update, remove } = useTable<Manutencao>("manutencoes");
+  const { rows, loading, insert, update, remove } = useTable<Manutencao>("manutencoes", { audit: true });
   const { isAdmin } = useAuth();
   const { canSeeFinancial } = usePermissions();
   const [editing, setEditing] = useState<Manutencao | null>(null);

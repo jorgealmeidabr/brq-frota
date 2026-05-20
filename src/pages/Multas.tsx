@@ -19,7 +19,7 @@ import { downloadCSV } from "@/lib/csv";
 import { Money } from "@/components/Money";
 
 export default function Multas() {
-  const { rows, loading, insert, update, remove, reload } = useTable<Multa>("multas");
+  const { rows, loading, insert, update, remove, reload } = useTable<Multa>("multas", { audit: true });
   const { isAdmin } = useAuth();
   const { canSeeFinancial } = usePermissions();
   const [editing, setEditing] = useState<Multa | null>(null);

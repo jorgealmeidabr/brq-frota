@@ -12,7 +12,8 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { fmtBRL, fmtDate, fmtNumber, nowSP } from "@/lib/format";
 import { Money } from "@/components/Money";
 import type { Abastecimento, Checklist, Manutencao, Veiculo, UsuarioPerfil, Motorista } from "@/lib/types";
-import { ArrowLeft, Car, Fuel, Wrench, ClipboardCheck, TrendingUp, Lock, FileText, ShieldCheck, Receipt, Search as SearchIcon, Radio } from "lucide-react";
+import { ArrowLeft, Car, Fuel, Wrench, ClipboardCheck, TrendingUp, Lock, FileText, ShieldCheck, Receipt, Search as SearchIcon, Radio, History as HistoryIcon } from "lucide-react";
+import { AuditLogTab } from "@/components/AuditLogTab";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { useAuth } from "@/hooks/useAuth";
 import { getRestriction, setRestriction } from "@/lib/vehicleAccess";
@@ -270,6 +271,7 @@ export default function VeiculoDetalhe() {
           <TabsTrigger value="manutencoes"><Wrench className="mr-1 h-4 w-4" />Manutenções ({manutencoes.length})</TabsTrigger>
           <TabsTrigger value="abastecimentos"><Fuel className="mr-1 h-4 w-4" />Abastecimentos ({abastecimentos.length})</TabsTrigger>
           <TabsTrigger value="checklists"><ClipboardCheck className="mr-1 h-4 w-4" />Checklists ({checklists.length})</TabsTrigger>
+          {isAdmin && <TabsTrigger value="auditoria"><HistoryIcon className="mr-1 h-4 w-4" />Auditoria</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="manutencoes">
@@ -315,6 +317,12 @@ export default function VeiculoDetalhe() {
             }))}
           />
         </TabsContent>
+
+        {isAdmin && id && (
+          <TabsContent value="auditoria">
+            <AuditLogTab tabela="veiculos" registroId={id} />
+          </TabsContent>
+        )}
       </Tabs>
     </>
   );
