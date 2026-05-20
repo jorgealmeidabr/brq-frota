@@ -364,7 +364,7 @@ function statusPorData(dataISO?: string | null, pendente = false): DocStatus {
   if (!dataISO) return { label: "Não informado", classe: "bg-muted text-muted-foreground border-border" };
   const dias = Math.ceil((new Date(dataISO).getTime() - nowSP().getTime()) / 86_400_000);
   if (dias < 0) return { label: `Vencido há ${Math.abs(dias)}d`, classe: "bg-red-500/15 text-red-400 border-red-500/30" };
-  if (dias <= 60) return { label: `Vence em ${dias}d`, classe: "bg-amber-500/15 text-amber-400 border-amber-500/30" };
+  if (dias <= 60) return { label: `Vence em ${dias}d`, classe: "bg-blue-500/15 text-blue-400 border-blue-500/30" };
   return { label: `Vence em ${dias}d`, classe: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
 }
 
@@ -376,7 +376,7 @@ function DocCard({ icon, titulo, vencimento, status, extra }: {
       <CardContent className="space-y-2 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold">
-            <span className="text-amber-400">{icon}</span>
+            <span className="text-blue-400">{icon}</span>
             {titulo}
           </div>
           <Badge variant="outline" className={status.classe}>{status.label}</Badge>
@@ -396,7 +396,7 @@ function DocumentacaoSection({ veiculo }: { veiculo: Veiculo }) {
     <Card className="mb-6 shadow-card">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <FileText className="h-4 w-4 text-amber-400" />
+          <FileText className="h-4 w-4 text-blue-400" />
           Documentação
         </CardTitle>
       </CardHeader>
@@ -444,7 +444,7 @@ function DocumentacaoSection({ veiculo }: { veiculo: Veiculo }) {
             <CardContent className="space-y-2 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-semibold">
-                  <Radio className="h-4 w-4 text-amber-400" />
+                  <Radio className="h-4 w-4 text-blue-400" />
                   Rastreador
                 </div>
                 <Badge variant="outline" className={veiculo.rastreador_instalado

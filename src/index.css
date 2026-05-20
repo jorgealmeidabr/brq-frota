@@ -169,7 +169,7 @@
     align-items: center;
     gap: 12px;
     background: #1a1a1a;
-    border: 1px solid #EF9F27;
+    border: 1px solid #3B82F6;
     border-radius: 12px;
     padding: 10px 16px;
     box-shadow: 0 8px 24px hsl(0 0% 0% / 0.4);
@@ -188,7 +188,7 @@
     display: inline-block;
     width: 3px;
     border-radius: 2px;
-    background: #EF9F27;
+    background: #3B82F6;
     transform-origin: center;
     animation: voice-bounce 0.8s ease-in-out infinite;
   }
@@ -207,12 +207,12 @@
     width: 7px;
     height: 7px;
     border-radius: 9999px;
-    background: #EF9F27;
+    background: #3B82F6;
     animation: voice-blink 1s ease-in-out infinite;
   }
   .voice-indicator__label {
     font-size: 11px;
-    color: #EF9F27;
+    color: #3B82F6;
     font-weight: 600;
     letter-spacing: 0.02em;
   }
@@ -225,7 +225,7 @@
     text-overflow: ellipsis;
   }
   .voice-indicator__highlight {
-    color: #EF9F27;
+    color: #3B82F6;
     font-weight: 600;
     transition: color 0.1s ease;
   }
