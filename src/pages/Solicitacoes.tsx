@@ -39,6 +39,8 @@ const URG_OPTIONS = [
 const STATUS_OPTIONS: { value: RequestStatus; label: string }[] = [
   { value: "requested", label: "Solicitado" },
   { value: "pending",   label: "Pendente"   },
+  { value: "approved",  label: "Aprovado"   },
+  { value: "rejected",  label: "Rejeitado"  },
   { value: "completed", label: "Concluído"  },
 ];
 
@@ -187,6 +189,62 @@ export default function Solicitacoes() {
     const { error } = await (supabase as any).from("requests").update({ status: next }).eq("id", r.id);
     if (error) { toast({ title: "Erro", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Status atualizado" });
+    await reload();
+  };
+
+  const aprovar = async (r: Request) => {
+    if (!user) return;
+    try {
+      // Aprova
+      const { error: eUpd } = await (supabase as any).from("requests")
+        .update({ status: "approved", aprovado_por: user.id, aprovado_em: new Date().toISOString() })
+        .eq("id", r.id);
+      if (eUpd) throw eUpd;
+
+      // Cria registro derivado
+      if (r.type === "maintenance") {
+        await (supabase as any).from("manutencoes").insert({
+          veiculo_id: r.vehicle_id,
+          tipo: "corretiva",
+          data: new Date().toISOString().slice(0, 10),
+          km_momento: r.km,
+          descricao: r.problem_description ?? r.observations ?? `Solicitação ${r.protocol}`,
+          custo_total: 0,
+          status: "agendada",
+          prioridade: r.urgency === "high" ? "alta" : r.urgency === "low" ? "baixa" : "media",
+        });
+      } else if (r.type === "fuel") {
+        await (supabase as any).from("abastecimentos").insert({
+          veiculo_id: r.vehicle_id,
+          motorista_id: null,
+          data: new Date().toISOString().slice(0, 10),
+          km_atual: r.km,
+          litros: r.liters ?? 0,
+          valor_total: 0,
+          posto: `Solicitação ${r.protocol}`,
+        });
+      }
+
+      await (supabase as any).from("requests").update({ status: "completed" }).eq("id", r.id);
+      toast({ title: "Solicitação aprovada", description: `Protocolo ${r.protocol}` });
+      await reload();
+    } catch (e: any) {
+      toast({ title: "Erro ao aprovar", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const [rejeitando, setRejeitando] = useState<Request | null>(null);
+  const [motivo, setMotivo] = useState("");
+  const confirmarRejeicao = async () => {
+    if (!rejeitando || !motivo.trim()) {
+      toast({ title: "Informe o motivo da rejeição", variant: "destructive" }); return;
+    }
+    const { error } = await (supabase as any).from("requests")
+      .update({ status: "rejected", rejeitado_motivo: motivo.trim() })
+      .eq("id", rejeitando.id);
+    if (error) { toast({ title: "Erro", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "Solicitação rejeitada" });
+    setRejeitando(null); setMotivo("");
     await reload();
   };
 
@@ -455,6 +513,17 @@ export default function Solicitacoes() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
+                            {isAdmin && (r.status === "requested" || r.status === "pending") && (
+                              <>
+                                <Button size="sm" variant="outline" onClick={() => aprovar(r)}>Aprovar</Button>
+                                <Button size="sm" variant="destructive" onClick={() => { setRejeitando(r); setMotivo(""); }}>Rejeitar</Button>
+                              </>
+                            )}
+                            {!isAdmin && r.status === "rejected" && r.rejeitado_motivo && (
+                              <span className="text-xs text-destructive italic max-w-[200px] truncate" title={r.rejeitado_motivo}>
+                                Motivo: {r.rejeitado_motivo}
+                              </span>
+                            )}
                             <Button size="sm" variant="ghost" onClick={() => downloadPdf(r)}>
                               <Download className="mr-1 h-3.5 w-3.5" />PDF
                             </Button>
