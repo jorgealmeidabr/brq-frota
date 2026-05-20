@@ -101,7 +101,7 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
       <SidebarHeader className="border-b border-sidebar-border">
         <div className={cn("flex items-center gap-2 px-2 py-2", collapsed && "justify-center px-0")}>
           <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white shadow-elevated">
-            <img src={brqLogo} alt="BRQ Frota Interna" className="h-full w-full object-contain text-primary bg-white" />
+            <img src={brqLogo} alt="BRQ Frota Interna" className="h-full w-full text-primary bg-white object-cover" />
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
