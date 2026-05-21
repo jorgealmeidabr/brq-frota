@@ -145,7 +145,7 @@ export default function Solicitacoes() {
         type: activeTab,
         km: kmNum,
         observations: form.observations || null,
-        status: "requested",
+        status: "pending",
         urgency: activeTab === "maintenance" ? form.urgency : null,
         problem_description: activeTab === "maintenance" ? form.problem_description : null,
         fuel_type: activeTab === "fuel" ? form.fuel_type : null,
