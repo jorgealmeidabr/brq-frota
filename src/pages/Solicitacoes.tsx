@@ -495,25 +495,14 @@ export default function Solicitacoes() {
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">{fmtDateTime(r.created_at)}</TableCell>
                         <TableCell>
-                          {isAdmin ? (
-                            <Select value={r.status} onValueChange={(v: RequestStatus) => setStatus(r, v)}>
-                              <SelectTrigger className="h-8 w-[140px]"><SelectValue /></SelectTrigger>
-                              <SelectContent>
-                                {STATUS_OPTIONS.map(o => (
-                                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <StatusBadge status={r.status} />
-                          )}
+                          <StatusBadge status={r.status} />
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
                             {isAdmin && (r.status === "requested" || r.status === "pending") && (
                               <>
                                 <Button size="sm" variant="outline" onClick={() => aprovar(r)}>Aprovar</Button>
-                                <Button size="sm" variant="destructive" onClick={() => { setRejeitando(r); setMotivo(""); }}>Rejeitar</Button>
+                                <Button size="sm" variant="destructive" onClick={() => rejeitar(r)}>Rejeitar</Button>
                               </>
                             )}
                             {!isAdmin && r.status === "rejected" && r.rejeitado_motivo && (
