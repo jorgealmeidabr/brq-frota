@@ -207,6 +207,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const idleEnabled = !!user && location.pathname !== "/veiculos";
   const { idle, wake } = useIdle(50000, idleEnabled);
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+    else document.exitFullscreen?.().catch(() => {});
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -217,13 +228,25 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <div aria-hidden="true" className="mx-2" style={{ width: "1px", height: "28px", backgroundColor: "#2a2a2a" }} />
             <TopbarClock />
             <div className="ml-auto flex items-center gap-2">
-              <GlobalSearch />
               {tipoConta && (
                 <Badge variant={tipoConta === "admin" ? "brand" : "secondary"}>
                   {tipoConta === "admin" ? "Admin" : "Usuário"}
                 </Badge>
               )}
               <span className="hidden text-xs text-muted-foreground md:inline">{user?.email}</span>
+              <NavLink to="/alertas" className="relative inline-flex">
+                <Button variant="ghost" size="icon" aria-label="Alertas">
+                  <Bell className="h-4 w-4" />
+                  {alertCount > 0 && (
+                    <Badge variant="destructive" className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] justify-center px-1 text-[10px]">
+                      {alertCount}
+                    </Badge>
+                  )}
+                </Button>
+              </NavLink>
+              <Button variant="ghost" size="icon" onClick={toggleFullscreen} aria-label="Tela cheia">
+                {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+              </Button>
               <Button variant="ghost" size="icon" onClick={toggle} aria-label="Alternar tema">
                 {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
               </Button>
