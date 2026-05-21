@@ -128,46 +128,6 @@ export default function MeuPerfil() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader><CardTitle className="text-base">Conta</CardTitle></CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Tipo</span>
-              <Badge className={tipoConta === "admin" ? "bg-purple-600/15 text-purple-600 border border-purple-600/30" : "bg-muted text-muted-foreground"}>
-                {tipoConta === "admin" ? "Admin" : "Usuário"}
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Último acesso</span>
-              <span>{perfil?.last_login ? fmtDateTime(perfil.last_login) : "—"}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-2">
-          <CardHeader><CardTitle className="text-base">Trocar senha</CardTitle></CardHeader>
-          <CardContent className="grid gap-3 md:grid-cols-2">
-            <div className="space-y-1.5"><Label>Nova senha</Label><Input type="password" value={pwd.p1} onChange={e => setPwd(s => ({ ...s, p1: e.target.value }))} /></div>
-            <div className="space-y-1.5"><Label>Confirmar</Label><Input type="password" value={pwd.p2} onChange={e => setPwd(s => ({ ...s, p2: e.target.value }))} /></div>
-            <div className="md:col-span-2"><Button onClick={trocarSenha} variant="outline">Atualizar senha</Button></div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2 text-base"><Lock className="h-4 w-4" />Meus acessos</CardTitle></CardHeader>
-          <CardContent className="space-y-1.5 text-sm">
-            {(Object.keys(MOD_LABELS) as ModuloPermissao[]).map(k => {
-              const ok = k === "financeiro" ? !!permissoes.financeiro : canSee(k);
-              return (
-                <div key={k} className="flex items-center justify-between">
-                  <span className="text-muted-foreground">{MOD_LABELS[k]}</span>
-                  {ok ? <Check className="h-4 w-4 text-success" /> : <X className="h-4 w-4 text-muted-foreground/40" />}
-                </div>
-              );
-            })}
-            <p className="mt-2 text-[11px] text-muted-foreground">Apenas um administrador pode alterar suas permissões.</p>
-          </CardContent>
-        </Card>
       </div>
     </>
   );
