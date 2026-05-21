@@ -86,10 +86,10 @@ export default function MeuPerfil() {
 
   return (
     <>
-      <PageHeader title="Meu perfil" subtitle="Seus dados, senha e o que você pode acessar" />
+      <PageHeader title="Meu perfil" subtitle="Seus dados pessoais" />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div className="grid gap-4">
+        <Card>
           <CardHeader><CardTitle className="text-base">Dados pessoais</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4">
