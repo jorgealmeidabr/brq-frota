@@ -109,6 +109,7 @@ export default function Solicitacoes() {
   }, []);
 
   const filtered = useMemo(() => rows.filter(r => {
+    if (r.status === "rejected") return false;
     if (fType !== "all" && r.type !== fType) return false;
     if (fStatus !== "all" && r.status !== fStatus) return false;
     return true;
