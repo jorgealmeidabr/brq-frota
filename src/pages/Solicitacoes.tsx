@@ -234,18 +234,14 @@ export default function Solicitacoes() {
     }
   };
 
-  const [rejeitando, setRejeitando] = useState<Request | null>(null);
-  const [motivo, setMotivo] = useState("");
-  const confirmarRejeicao = async () => {
-    if (!rejeitando || !motivo.trim()) {
-      toast({ title: "Informe o motivo da rejeição", variant: "destructive" }); return;
-    }
+  const rejeitar = async (r: Request) => {
+    const motivo = window.prompt("Motivo da rejeição:")?.trim();
+    if (!motivo) { toast({ title: "Informe o motivo da rejeição", variant: "destructive" }); return; }
     const { error } = await (supabase as any).from("requests")
-      .update({ status: "rejected", rejeitado_motivo: motivo.trim() })
-      .eq("id", rejeitando.id);
+      .update({ status: "rejected", rejeitado_motivo: motivo })
+      .eq("id", r.id);
     if (error) { toast({ title: "Erro", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Solicitação rejeitada" });
-    setRejeitando(null); setMotivo("");
     await reload();
   };
 
