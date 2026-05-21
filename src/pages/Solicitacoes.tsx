@@ -109,6 +109,7 @@ export default function Solicitacoes() {
   }, []);
 
   const filtered = useMemo(() => rows.filter(r => {
+    if (r.status === "rejected") return false;
     if (fType !== "all" && r.type !== fType) return false;
     if (fStatus !== "all" && r.status !== fStatus) return false;
     return true;
@@ -145,7 +146,7 @@ export default function Solicitacoes() {
         type: activeTab,
         km: kmNum,
         observations: form.observations || null,
-        status: "requested",
+        status: "pending",
         urgency: activeTab === "maintenance" ? form.urgency : null,
         problem_description: activeTab === "maintenance" ? form.problem_description : null,
         fuel_type: activeTab === "fuel" ? form.fuel_type : null,
@@ -233,18 +234,14 @@ export default function Solicitacoes() {
     }
   };
 
-  const [rejeitando, setRejeitando] = useState<Request | null>(null);
-  const [motivo, setMotivo] = useState("");
-  const confirmarRejeicao = async () => {
-    if (!rejeitando || !motivo.trim()) {
-      toast({ title: "Informe o motivo da rejeição", variant: "destructive" }); return;
-    }
+  const rejeitar = async (r: Request) => {
+    const motivo = window.prompt("Motivo da rejeição:")?.trim();
+    if (!motivo) { toast({ title: "Informe o motivo da rejeição", variant: "destructive" }); return; }
     const { error } = await (supabase as any).from("requests")
-      .update({ status: "rejected", rejeitado_motivo: motivo.trim() })
-      .eq("id", rejeitando.id);
+      .update({ status: "rejected", rejeitado_motivo: motivo })
+      .eq("id", r.id);
     if (error) { toast({ title: "Erro", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Solicitação rejeitada" });
-    setRejeitando(null); setMotivo("");
     await reload();
   };
 
@@ -498,25 +495,14 @@ export default function Solicitacoes() {
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">{fmtDateTime(r.created_at)}</TableCell>
                         <TableCell>
-                          {isAdmin ? (
-                            <Select value={r.status} onValueChange={(v: RequestStatus) => setStatus(r, v)}>
-                              <SelectTrigger className="h-8 w-[140px]"><SelectValue /></SelectTrigger>
-                              <SelectContent>
-                                {STATUS_OPTIONS.map(o => (
-                                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <StatusBadge status={r.status} />
-                          )}
+                          <StatusBadge status={r.status} />
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
                             {isAdmin && (r.status === "requested" || r.status === "pending") && (
                               <>
                                 <Button size="sm" variant="outline" onClick={() => aprovar(r)}>Aprovar</Button>
-                                <Button size="sm" variant="destructive" onClick={() => { setRejeitando(r); setMotivo(""); }}>Rejeitar</Button>
+                                <Button size="sm" variant="destructive" onClick={() => rejeitar(r)}>Rejeitar</Button>
                               </>
                             )}
                             {!isAdmin && r.status === "rejected" && r.rejeitado_motivo && (
