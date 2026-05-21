@@ -288,11 +288,20 @@ export default function Agendamentos() {
     }
 
     try {
+      // datetime-local vem sem timezone; converter para ISO com offset local
+      // para que o Postgres não interprete como UTC e desloque o horário.
+      const toIso = (v: string) => {
+        const d = new Date(v);
+        return isNaN(d.getTime()) ? v : d.toISOString();
+      };
+      const inicioIso = toIso(form.data_saida);
+      const fimIso = toIso(form.data_retorno_prevista);
+
       // Dupla checagem server-side (em caso de corrida)
       const { data: conflitoSrv } = await (supabase.rpc as any)("check_agendamento_conflito", {
         _veiculo_id: pickedVeiculo.id,
-        _inicio: form.data_saida,
-        _fim: form.data_retorno_prevista,
+        _inicio: inicioIso,
+        _fim: fimIso,
         _ignore_id: null,
       });
       if (conflitoSrv === true) {
@@ -302,6 +311,8 @@ export default function Agendamentos() {
 
       await insert({
         ...form,
+        data_saida: inicioIso,
+        data_retorno_prevista: fimIso,
         veiculo_id: pickedVeiculo.id,
         status: "ativo",
         km_saida: pickedVeiculo.km_atual,
