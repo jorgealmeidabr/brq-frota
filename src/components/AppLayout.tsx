@@ -80,7 +80,8 @@ const groups: NavGroup[] = [
 function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestCount: number }) {
   const { state } = useSidebar();
   const location = useLocation();
-  const { canSee } = usePermissions();
+  const { canSee, isAdmin } = usePermissions();
+  const { isBlocked, setModuleBlocked } = useBlockedModules();
   const collapsed = state === "collapsed";
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(
@@ -90,8 +91,16 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
     setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }));
 
   // CRÍTICO: itens sem acesso NÃO existem no DOM
+  // Para não-admin: também esconde módulos globalmente bloqueados
   const visibleGroups = groups
-    .map(g => ({ ...g, items: g.items.filter(i => !i.perm || canSee(i.perm)) }))
+    .map(g => ({
+      ...g,
+      items: g.items.filter(i => {
+        if (i.perm && !canSee(i.perm)) return false;
+        if (!isAdmin && i.perm && isBlocked(i.perm)) return false;
+        return true;
+      }),
+    }))
     .filter(g => g.items.length > 0);
 
   return (
