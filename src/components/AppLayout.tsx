@@ -191,7 +191,7 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                   }
 
                   return (
-                    <SidebarMenuItem key={item.url}>
+                    <SidebarMenuItem key={item.url} className="group/menuitem relative">
                       <SidebarMenuButton asChild isActive={active}>
                         <NavLink
                           to={item.url}
@@ -216,6 +216,29 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                           )}
                         </NavLink>
                       </SidebarMenuButton>
+                      {isAdmin && item.perm && !collapsed && (
+                        <ConfirmDialog
+                          title={`Bloquear módulo "${item.title}"?`}
+                          description="O módulo deixará de enviar/receber informações e ficará oculto para usuários comuns. Você poderá reativá-lo a qualquer momento."
+                          confirmLabel="Bloquear"
+                          destructive
+                          onConfirm={async () => {
+                            const { error } = await setModuleBlocked(item.perm!, true);
+                            if (error) toast.error(error);
+                            else toast.success(`Módulo "${item.title}" bloqueado.`);
+                          }}
+                          trigger={
+                            <button
+                              type="button"
+                              aria-label={`Bloquear ${item.title}`}
+                              className="absolute right-1 top-1/2 -translate-y-1/2 hidden group-hover/menuitem:flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Lock className="h-3 w-3" />
+                            </button>
+                          }
+                        />
+                      )}
                     </SidebarMenuItem>
                   );
                 })}
