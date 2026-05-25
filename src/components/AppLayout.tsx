@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown, DollarSign, Maximize, Minimize, Lock } from "lucide-react";
-import { useBlockedModules } from "@/hooks/useBlockedModules";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { toast } from "sonner";
+import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown, DollarSign, Maximize, Minimize } from "lucide-react";
 import brqLogo from "@/assets/brq-logo-app.png";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -80,8 +77,7 @@ const groups: NavGroup[] = [
 function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestCount: number }) {
   const { state } = useSidebar();
   const location = useLocation();
-  const { canSee, isAdmin } = usePermissions();
-  const { isBlocked, setModuleBlocked } = useBlockedModules();
+  const { canSee } = usePermissions();
   const collapsed = state === "collapsed";
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(
@@ -91,16 +87,8 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
     setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }));
 
   // CRÍTICO: itens sem acesso NÃO existem no DOM
-  // Para não-admin: também esconde módulos globalmente bloqueados
   const visibleGroups = groups
-    .map(g => ({
-      ...g,
-      items: g.items.filter(i => {
-        if (i.perm && !canSee(i.perm)) return false;
-        if (!isAdmin && i.perm && isBlocked(i.perm)) return false;
-        return true;
-      }),
-    }))
+    .map(g => ({ ...g, items: g.items.filter(i => !i.perm || canSee(i.perm)) }))
     .filter(g => g.items.length > 0);
 
   return (
@@ -161,37 +149,8 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                   const badgeVariant: "destructive" | "default" =
                     item.url === "/alertas" ? "destructive" : "default";
                   const showBadge = badgeValue > 0;
-                  const blocked = !!(item.perm && isBlocked(item.perm));
-
-                  // Admin: módulo bloqueado vira botão com cadeado + confirm para reativar
-                  if (blocked && isAdmin) {
-                    return (
-                      <SidebarMenuItem key={item.url}>
-                        <ConfirmDialog
-                          title={`Reativar módulo "${item.title}"?`}
-                          description="O módulo voltará a aparecer para todos os usuários e a enviar/receber informações normalmente."
-                          confirmLabel="Reativar"
-                          onConfirm={async () => {
-                            const { error } = await setModuleBlocked(item.perm!, false);
-                            if (error) toast.error(error);
-                            else toast.success(`Módulo "${item.title}" reativado.`);
-                          }}
-                          trigger={
-                            <SidebarMenuButton isActive={false} className={cn("relative opacity-70", collapsed && "justify-center")}>
-                              <item.icon className="h-4 w-4 shrink-0" />
-                              {!collapsed && (
-                                <span className="flex-1 overflow-hidden whitespace-nowrap">{item.title}</span>
-                              )}
-                              <Lock className={cn("h-3.5 w-3.5 text-muted-foreground", collapsed && "absolute top-1 right-1.5")} />
-                            </SidebarMenuButton>
-                          }
-                        />
-                      </SidebarMenuItem>
-                    );
-                  }
-
                   return (
-                    <SidebarMenuItem key={item.url} className="group/menuitem relative">
+                    <SidebarMenuItem key={item.url}>
                       <SidebarMenuButton asChild isActive={active}>
                         <NavLink
                           to={item.url}
@@ -216,29 +175,6 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                           )}
                         </NavLink>
                       </SidebarMenuButton>
-                      {isAdmin && item.perm && !collapsed && (
-                        <ConfirmDialog
-                          title={`Bloquear módulo "${item.title}"?`}
-                          description="O módulo deixará de enviar/receber informações e ficará oculto para usuários comuns. Você poderá reativá-lo a qualquer momento."
-                          confirmLabel="Bloquear"
-                          destructive
-                          onConfirm={async () => {
-                            const { error } = await setModuleBlocked(item.perm!, true);
-                            if (error) toast.error(error);
-                            else toast.success(`Módulo "${item.title}" bloqueado.`);
-                          }}
-                          trigger={
-                            <button
-                              type="button"
-                              aria-label={`Bloquear ${item.title}`}
-                              className="absolute right-1 top-1/2 -translate-y-1/2 hidden group-hover/menuitem:flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Lock className="h-3 w-3" />
-                            </button>
-                          }
-                        />
-                      )}
                     </SidebarMenuItem>
                   );
                 })}
