@@ -161,6 +161,35 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                   const badgeVariant: "destructive" | "default" =
                     item.url === "/alertas" ? "destructive" : "default";
                   const showBadge = badgeValue > 0;
+                  const blocked = !!(item.perm && isBlocked(item.perm));
+
+                  // Admin: módulo bloqueado vira botão com cadeado + confirm para reativar
+                  if (blocked && isAdmin) {
+                    return (
+                      <SidebarMenuItem key={item.url}>
+                        <ConfirmDialog
+                          title={`Reativar módulo "${item.title}"?`}
+                          description="O módulo voltará a aparecer para todos os usuários e a enviar/receber informações normalmente."
+                          confirmLabel="Reativar"
+                          onConfirm={async () => {
+                            const { error } = await setModuleBlocked(item.perm!, false);
+                            if (error) toast.error(error);
+                            else toast.success(`Módulo "${item.title}" reativado.`);
+                          }}
+                          trigger={
+                            <SidebarMenuButton isActive={false} className={cn("relative opacity-70", collapsed && "justify-center")}>
+                              <item.icon className="h-4 w-4 shrink-0" />
+                              {!collapsed && (
+                                <span className="flex-1 overflow-hidden whitespace-nowrap">{item.title}</span>
+                              )}
+                              <Lock className={cn("h-3.5 w-3.5 text-muted-foreground", collapsed && "absolute top-1 right-1.5")} />
+                            </SidebarMenuButton>
+                          }
+                        />
+                      </SidebarMenuItem>
+                    );
+                  }
+
                   return (
                     <SidebarMenuItem key={item.url}>
                       <SidebarMenuButton asChild isActive={active}>
