@@ -5,21 +5,23 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, ClipboardCheck } from "lucide-react";
 import { useChecklistPendente } from "@/hooks/useChecklistPendente";
 import { useAuth } from "@/hooks/useAuth";
+import { useBlockedModules } from "@/hooks/useBlockedModules";
 import { fmtDateTime } from "@/lib/format";
 
 /**
  * Modal global que bloqueia o usuário até preencher o checklist pós-uso.
- * Não bloqueia: rotas /checklists, /meu-perfil, /auth e o Admin.
+ * Não bloqueia: rotas /checklists, /meu-perfil, /auth, Admin, ou módulo "checklists" bloqueado globalmente.
  */
 export function ChecklistPendenteBlock() {
   const { isAdmin } = useAuth();
   const { pendentes, loading } = useChecklistPendente();
+  const { isBlocked } = useBlockedModules();
   const navigate = useNavigate();
   const location = useLocation();
 
   const allowedPaths = ["/checklists", "/meu-perfil", "/auth"];
   const isOnAllowed = allowedPaths.some(p => location.pathname.startsWith(p));
-  const shouldShow = !loading && !isAdmin && pendentes.length > 0 && !isOnAllowed;
+  const shouldShow = !loading && !isAdmin && pendentes.length > 0 && !isOnAllowed && !isBlocked("checklists");
 
   useEffect(() => {
     if (!shouldShow) return;
