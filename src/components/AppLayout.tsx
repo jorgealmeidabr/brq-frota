@@ -30,6 +30,7 @@ interface NavItem {
   url: string;
   icon: any;
   perm?: ModuloPermissao;
+  adminOnly?: boolean;
 }
 
 interface NavGroup {
@@ -71,7 +72,7 @@ const groups: NavGroup[] = [
     items: [
       { title: "Meu perfil",     url: "/meu-perfil",    icon: UserCircle2 },
       { title: "Alertas",        url: "/alertas",       icon: Bell, perm: "alertas" },
-      { title: "Configurações",  url: "/configuracoes", icon: Settings },
+      { title: "Configurações",  url: "/configuracoes", icon: Settings, adminOnly: true },
     ],
   },
 ];
