@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown, DollarSign, Maximize, Minimize } from "lucide-react";
+import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown, DollarSign, Maximize, Minimize, Lock, Settings } from "lucide-react";
 import brqLogo from "@/assets/brq-logo-app.png";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -13,6 +13,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlerts } from "@/hooks/useAlerts";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useModulosBloqueados } from "@/hooks/useModulosBloqueados";
 import { useRequestBadge } from "@/hooks/useRequestBadge";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -68,8 +69,9 @@ const groups: NavGroup[] = [
   {
     label: "Conta",
     items: [
-      { title: "Meu perfil", url: "/meu-perfil", icon: UserCircle2 },
-      { title: "Alertas",    url: "/alertas",    icon: Bell, perm: "alertas" },
+      { title: "Meu perfil",     url: "/meu-perfil",    icon: UserCircle2 },
+      { title: "Alertas",        url: "/alertas",       icon: Bell, perm: "alertas" },
+      { title: "Configurações",  url: "/configuracoes", icon: Settings },
     ],
   },
 ];
