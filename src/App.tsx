@@ -31,7 +31,6 @@ import Solicitacoes from "./pages/Solicitacoes";
 import Acidentes from "./pages/Acidentes";
 import Financeiro from "./pages/Financeiro";
 import AcidenteDetalhe from "./pages/AcidenteDetalhe";
-import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
 import type { ModuloPermissao } from "@/lib/types";
 
@@ -73,7 +72,6 @@ const App = () => (
             <Route path="/acidentes" element={<Protected perm="acidentes"><Acidentes /></Protected>} />
             <Route path="/acidentes/:id" element={<Protected admin><AcidenteDetalhe /></Protected>} />
             <Route path="/usuarios" element={<Protected admin><Usuarios /></Protected>} />
-            <Route path="/configuracoes" element={<Protected admin><Configuracoes /></Protected>} />
             <Route path="/meu-perfil" element={<ProtectedRoute><AppLayout><MeuPerfil /></AppLayout></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
