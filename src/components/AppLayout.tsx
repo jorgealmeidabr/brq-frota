@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown, DollarSign, Maximize, Minimize } from "lucide-react";
+import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown, DollarSign, Maximize, Minimize, Lock, Settings } from "lucide-react";
 import brqLogo from "@/assets/brq-logo-app.png";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -13,6 +13,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlerts } from "@/hooks/useAlerts";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useModulosBloqueados } from "@/hooks/useModulosBloqueados";
 import { useRequestBadge } from "@/hooks/useRequestBadge";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -29,6 +30,7 @@ interface NavItem {
   url: string;
   icon: any;
   perm?: ModuloPermissao;
+  adminOnly?: boolean;
 }
 
 interface NavGroup {
@@ -68,8 +70,9 @@ const groups: NavGroup[] = [
   {
     label: "Conta",
     items: [
-      { title: "Meu perfil", url: "/meu-perfil", icon: UserCircle2 },
-      { title: "Alertas",    url: "/alertas",    icon: Bell, perm: "alertas" },
+      { title: "Meu perfil",     url: "/meu-perfil",    icon: UserCircle2 },
+      { title: "Alertas",        url: "/alertas",       icon: Bell, perm: "alertas" },
+      { title: "Configurações",  url: "/configuracoes", icon: Settings, adminOnly: true },
     ],
   },
 ];
@@ -77,7 +80,8 @@ const groups: NavGroup[] = [
 function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestCount: number }) {
   const { state } = useSidebar();
   const location = useLocation();
-  const { canSee } = usePermissions();
+  const { canSee, isAdmin } = usePermissions();
+  const { isBlocked } = useModulosBloqueados();
   const collapsed = state === "collapsed";
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(
@@ -88,7 +92,14 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
 
   // CRÍTICO: itens sem acesso NÃO existem no DOM
   const visibleGroups = groups
-    .map(g => ({ ...g, items: g.items.filter(i => !i.perm || canSee(i.perm)) }))
+    .map(g => ({
+      ...g,
+      items: g.items.filter(i => {
+        if (i.adminOnly && !isAdmin) return false;
+        if (i.perm && !canSee(i.perm)) return false;
+        return true;
+      }),
+    }))
     .filter(g => g.items.length > 0);
 
   return (
@@ -143,12 +154,13 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
               <SidebarMenu>
                 {group.items.map(item => {
                   const active = item.url === "/" ? location.pathname === "/" : location.pathname.startsWith(item.url);
+                  const blocked = isAdmin && !!item.perm && isBlocked(item.perm);
                   const badgeValue =
                     item.url === "/alertas" ? alertCount :
                     item.url === "/solicitacoes" ? requestCount : 0;
                   const badgeVariant: "destructive" | "default" =
                     item.url === "/alertas" ? "destructive" : "default";
-                  const showBadge = badgeValue > 0;
+                  const showBadge = badgeValue > 0 && !blocked;
                   return (
                     <SidebarMenuItem key={item.url}>
                       <SidebarMenuButton asChild isActive={active}>
@@ -158,11 +170,16 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                           className={cn(
                             "relative",
                             collapsed && "flex items-center justify-center w-full py-2",
+                            blocked && "opacity-60",
                           )}
+                          title={blocked ? "Módulo bloqueado" : undefined}
                         >
                           <item.icon className="h-4 w-4 shrink-0" />
                           {!collapsed && (
                             <span className="flex-1 overflow-hidden whitespace-nowrap">{item.title}</span>
+                          )}
+                          {blocked && (
+                            <Lock className={cn("h-3 w-3 text-destructive", collapsed && "absolute top-1 right-1")} />
                           )}
                           {showBadge && (
                             <Badge variant={badgeVariant} className={cn(
