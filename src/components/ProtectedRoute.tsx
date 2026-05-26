@@ -1,3 +1,4 @@
+import { cloneElement, isValidElement } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -48,10 +49,8 @@ export function ProtectedRoute({ children, requireAdmin, requirePerm }: Props) {
 
 // Mantém o AppLayout em volta do BlockedModuleScreen (o children já vem envolto pelo Protected wrapper)
 function wrapBlocked(children: React.ReactNode, modulo: ModuloPermissao) {
-  // children é <AppLayout>...</AppLayout>; substituímos o conteúdo interno
-  const el = children as React.ReactElement<any>;
-  if (el && el.props && "children" in el.props) {
-    return { ...el, props: { ...el.props, children: <BlockedModuleScreen modulo={modulo} /> } } as React.ReactElement;
+  if (isValidElement(children)) {
+    return cloneElement(children as React.ReactElement<any>, undefined, <BlockedModuleScreen modulo={modulo} />);
   }
   return <BlockedModuleScreen modulo={modulo} />;
 }
