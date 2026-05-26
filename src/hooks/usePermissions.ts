@@ -1,15 +1,19 @@
 import { useAuth } from "./useAuth";
+import { useModulosBloqueados } from "./useModulosBloqueados";
 import type { ModuloPermissao, Permissoes } from "@/lib/types";
 
 /**
  * Hook global de permissões granulares.
  * - Admin sempre vê tudo (permissoes vem como PERMISSOES_TUDO em useAuth).
  * - Para usuários comuns, lê o jsonb permissoes definido pelo admin.
+ * - Módulos bloqueados globalmente (admin) somem para usuários comuns;
+ *   para o admin continuam visíveis (marcados como bloqueados).
  * - Fallback legado: se não há `usuarios_perfis`, comporta como antes
  *   (admin → tudo; motorista → apenas agendamentos+checklists).
  */
 export function usePermissions() {
   const { permissoes, isAdmin, role, perfil } = useAuth();
+  const { isBlocked } = useModulosBloqueados();
 
   const fallback: Permissoes = isAdmin
     ? {
@@ -25,8 +29,6 @@ export function usePermissions() {
         solicitacoes: true, acidentes: true,
       };
 
-  // Mescla permissões salvas com defaults para módulos que devem
-  // estar liberados a todos os usuários (ex.: acidentes, solicitações).
   const baseDefaults: Partial<Permissoes> = {
     acidentes: true,
     solicitacoes: true,
@@ -38,19 +40,25 @@ export function usePermissions() {
     : fallback;
 
   const canSee = (modulo: ModuloPermissao): boolean => {
+    // Módulo desativado globalmente: usuários comuns não enxergam.
+    // Admin continua vendo (com indicação de bloqueado).
+    if (isBlocked(modulo) && !isAdmin) return false;
     if (isAdmin) return true;
-    // Se a chave nunca foi definida nas permissões salvas, usa default
     if (permissoes && permissoes[modulo] === undefined && baseDefaults[modulo]) return true;
     return !!p[modulo];
   };
-  const canSeeFinancial = (): boolean => isAdmin || !!p.financeiro;
+  const canSeeFinancial = (): boolean => {
+    if (isBlocked("financeiro") && !isAdmin) return false;
+    return isAdmin || !!p.financeiro;
+  };
 
   return {
     permissoes: p,
     canSee,
     canSeeFinancial,
+    isBlocked,
     isAdmin,
-    isManagedUser: !!perfil, // tem registro em usuarios_perfis
+    isManagedUser: !!perfil,
     role,
   };
 }
