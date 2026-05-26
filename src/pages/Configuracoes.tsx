@@ -51,7 +51,7 @@ export default function Configuracoes() {
     <div className="space-y-4">
       <PageHeader
         title="Configurações"
-        description="Ative ou desative módulos do sistema. Os módulos desativados deixam de existir para os demais usuários."
+        subtitle="Ative ou desative módulos do sistema. Os módulos desativados deixam de existir para os demais usuários."
       />
 
       <Card>
