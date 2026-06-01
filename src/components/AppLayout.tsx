@@ -162,6 +162,7 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                   const badgeVariant: "destructive" | "default" =
                     item.url === "/alertas" ? "destructive" : "default";
                   const showBadge = badgeValue > 0;
+                  const moduloTrancado = !!item.perm && isAdmin && isLocked(item.perm);
                   return (
                     <SidebarMenuItem key={item.url}>
                       <SidebarMenuButton asChild isActive={active}>
@@ -175,7 +176,16 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                         >
                           <item.icon className="h-4 w-4 shrink-0" />
                           {!collapsed && (
-                            <span className="flex-1 overflow-hidden whitespace-nowrap">{item.title}</span>
+                            <span className={cn(
+                              "flex-1 overflow-hidden whitespace-nowrap",
+                              moduloTrancado && "text-muted-foreground",
+                            )}>{item.title}</span>
+                          )}
+                          {moduloTrancado && (
+                            <Lock className={cn(
+                              "h-3.5 w-3.5 shrink-0 text-muted-foreground",
+                              collapsed && "absolute bottom-1 right-1.5",
+                            )} />
                           )}
                           {showBadge && (
                             <Badge variant={badgeVariant} className={cn(
