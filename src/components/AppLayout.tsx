@@ -49,6 +49,7 @@ const groups: NavGroup[] = [
       { title: "Financeiro",   url: "/financeiro",   icon: DollarSign,      perm: "financeiro" },
       { title: "Multas",       url: "/multas",       icon: AlertTriangle,   perm: "multas" },
       { title: "Usuários",     url: "/usuarios",     icon: ShieldCheck,     perm: "usuarios" },
+      { title: "Módulos",      url: "/modulos",      icon: SlidersHorizontal, adminOnly: true },
     ],
   },
   {
