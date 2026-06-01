@@ -36,6 +36,8 @@ export function ProtectedRoute({ children, requireAdmin, requirePerm }: Props) {
 
   if (requireAdmin && !isAdmin) return <Navigate to="/agendamentos" replace />;
   if (requirePerm && !canSee(requirePerm)) return <Navigate to="/agendamentos" replace />;
+  // Módulo bloqueado: usuários comuns não acessam; admin continua entrando
+  if (requirePerm && !isAdmin && isLocked(requirePerm)) return <Navigate to="/agendamentos" replace />;
 
   return <>{children}</>;
 }
