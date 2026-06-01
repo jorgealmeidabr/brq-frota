@@ -26,6 +26,7 @@ import Multas from "./pages/Multas";
 import Historico from "./pages/Historico";
 import Alertas from "./pages/Alertas";
 import Usuarios from "./pages/Usuarios";
+import Modulos from "./pages/Modulos";
 import MeuPerfil from "./pages/MeuPerfil";
 import Solicitacoes from "./pages/Solicitacoes";
 import Acidentes from "./pages/Acidentes";
