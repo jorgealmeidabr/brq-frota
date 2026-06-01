@@ -26,6 +26,7 @@ import Multas from "./pages/Multas";
 import Historico from "./pages/Historico";
 import Alertas from "./pages/Alertas";
 import Usuarios from "./pages/Usuarios";
+import Modulos from "./pages/Modulos";
 import MeuPerfil from "./pages/MeuPerfil";
 import Solicitacoes from "./pages/Solicitacoes";
 import Acidentes from "./pages/Acidentes";
@@ -72,6 +73,7 @@ const App = () => (
             <Route path="/acidentes" element={<Protected perm="acidentes"><Acidentes /></Protected>} />
             <Route path="/acidentes/:id" element={<Protected admin><AcidenteDetalhe /></Protected>} />
             <Route path="/usuarios" element={<Protected admin><Usuarios /></Protected>} />
+            <Route path="/modulos" element={<Protected admin><Modulos /></Protected>} />
             <Route path="/meu-perfil" element={<ProtectedRoute><AppLayout><MeuPerfil /></AppLayout></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />

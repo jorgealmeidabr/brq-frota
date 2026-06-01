@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown, DollarSign, Maximize, Minimize } from "lucide-react";
+import { LayoutDashboard, Car, Users, Wrench, Fuel, CalendarRange, ClipboardCheck, AlertTriangle, History, LogOut, Moon, Sun, Bell, ShieldCheck, UserCircle2, FileText, AlertOctagon, ChevronDown, DollarSign, Maximize, Minimize, Lock, SlidersHorizontal } from "lucide-react";
 import brqLogo from "@/assets/brq-logo-app.png";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -13,6 +13,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlerts } from "@/hooks/useAlerts";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useModuleLocks } from "@/hooks/useModuleLocks";
 import { useRequestBadge } from "@/hooks/useRequestBadge";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -29,6 +30,7 @@ interface NavItem {
   url: string;
   icon: any;
   perm?: ModuloPermissao;
+  adminOnly?: boolean;
 }
 
 interface NavGroup {
@@ -47,6 +49,7 @@ const groups: NavGroup[] = [
       { title: "Financeiro",   url: "/financeiro",   icon: DollarSign,      perm: "financeiro" },
       { title: "Multas",       url: "/multas",       icon: AlertTriangle,   perm: "multas" },
       { title: "Usuários",     url: "/usuarios",     icon: ShieldCheck,     perm: "usuarios" },
+      { title: "Módulos",      url: "/modulos",      icon: SlidersHorizontal, adminOnly: true },
     ],
   },
   {
@@ -77,7 +80,8 @@ const groups: NavGroup[] = [
 function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestCount: number }) {
   const { state } = useSidebar();
   const location = useLocation();
-  const { canSee } = usePermissions();
+  const { canSee, isAdmin } = usePermissions();
+  const { isLocked } = useModuleLocks();
   const collapsed = state === "collapsed";
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(
@@ -86,9 +90,18 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
   const toggleGroup = (label: string) =>
     setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }));
 
-  // CRÍTICO: itens sem acesso NÃO existem no DOM
+  // CRÍTICO: itens sem acesso NÃO existem no DOM.
+  // Módulo bloqueado: some para usuários; admin continua vendo (com cadeado).
   const visibleGroups = groups
-    .map(g => ({ ...g, items: g.items.filter(i => !i.perm || canSee(i.perm)) }))
+    .map(g => ({
+      ...g,
+      items: g.items.filter(i => {
+        if (i.adminOnly && !isAdmin) return false;
+        if (i.perm && !canSee(i.perm)) return false;
+        if (i.perm && !isAdmin && isLocked(i.perm)) return false;
+        return true;
+      }),
+    }))
     .filter(g => g.items.length > 0);
 
   return (
@@ -149,6 +162,7 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                   const badgeVariant: "destructive" | "default" =
                     item.url === "/alertas" ? "destructive" : "default";
                   const showBadge = badgeValue > 0;
+                  const moduloTrancado = !!item.perm && isAdmin && isLocked(item.perm);
                   return (
                     <SidebarMenuItem key={item.url}>
                       <SidebarMenuButton asChild isActive={active}>
@@ -162,7 +176,16 @@ function AppSidebar({ alertCount, requestCount }: { alertCount: number; requestC
                         >
                           <item.icon className="h-4 w-4 shrink-0" />
                           {!collapsed && (
-                            <span className="flex-1 overflow-hidden whitespace-nowrap">{item.title}</span>
+                            <span className={cn(
+                              "flex-1 overflow-hidden whitespace-nowrap",
+                              moduloTrancado && "text-muted-foreground",
+                            )}>{item.title}</span>
+                          )}
+                          {moduloTrancado && (
+                            <Lock className={cn(
+                              "h-3.5 w-3.5 shrink-0 text-muted-foreground",
+                              collapsed && "absolute bottom-1 right-1.5",
+                            )} />
                           )}
                           {showBadge && (
                             <Badge variant={badgeVariant} className={cn(

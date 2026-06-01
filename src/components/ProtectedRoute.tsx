@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useModuleLocks } from "@/hooks/useModuleLocks";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import type { ModuloPermissao } from "@/lib/types";
 import PendingApproval from "@/pages/PendingApproval";
@@ -14,6 +15,7 @@ interface Props {
 export function ProtectedRoute({ children, requireAdmin, requirePerm }: Props) {
   const { user, loading, isAdmin, mustChangePassword, profileStatus } = useAuth();
   const { canSee } = usePermissions();
+  const { isLocked } = useModuleLocks();
   const location = useLocation();
 
   if (!isSupabaseConfigured) return <Navigate to="/setup" replace />;
@@ -34,6 +36,8 @@ export function ProtectedRoute({ children, requireAdmin, requirePerm }: Props) {
 
   if (requireAdmin && !isAdmin) return <Navigate to="/agendamentos" replace />;
   if (requirePerm && !canSee(requirePerm)) return <Navigate to="/agendamentos" replace />;
+  // Módulo bloqueado: usuários comuns não acessam; admin continua entrando
+  if (requirePerm && !isAdmin && isLocked(requirePerm)) return <Navigate to="/agendamentos" replace />;
 
   return <>{children}</>;
 }
