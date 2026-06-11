@@ -90,6 +90,7 @@ export default function Usuarios() {
   const [tab, setTab] = useState<"ativos" | "pendentes">("ativos");
 
   const [openModal, setOpenModal] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
   const [approving, setApproving] = useState<PendingProfile | null>(null);
 
