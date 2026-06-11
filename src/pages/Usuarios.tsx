@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { BulkImportUsersDialog } from "@/components/BulkImportUsersDialog";
+import { Upload } from "lucide-react";
 
 interface PendingProfile {
   id: string;
@@ -88,6 +90,7 @@ export default function Usuarios() {
   const [tab, setTab] = useState<"ativos" | "pendentes">("ativos");
 
   const [openModal, setOpenModal] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
   const [approving, setApproving] = useState<PendingProfile | null>(null);
 
@@ -163,9 +166,14 @@ export default function Usuarios() {
         title="Usuários"
         subtitle="Gestão de Usuários e Permissões"
         actions={
-          <Button variant="brand" onClick={() => { setEditing(null); setOpenModal(true); }}>
-            <Plus className="mr-1 h-4 w-4" />Novo usuário
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setOpenImport(true)}>
+              <Upload className="mr-1 h-4 w-4" />Importar em massa
+            </Button>
+            <Button variant="brand" onClick={() => { setEditing(null); setOpenModal(true); }}>
+              <Plus className="mr-1 h-4 w-4" />Novo usuário
+            </Button>
+          </div>
         }
       />
 
@@ -396,6 +404,14 @@ export default function Usuarios() {
         onSaved={reload}
         currentUserId={currentUser?.id ?? null}
       />
+
+      <BulkImportUsersDialog
+        open={openImport}
+        onOpenChange={setOpenImport}
+        existingEmails={rows.map(r => r.email ?? "").filter(Boolean) as string[]}
+        onDone={reload}
+      />
+
     </>
   );
 }
