@@ -166,9 +166,14 @@ export default function Usuarios() {
         title="Usuários"
         subtitle="Gestão de Usuários e Permissões"
         actions={
-          <Button variant="brand" onClick={() => { setEditing(null); setOpenModal(true); }}>
-            <Plus className="mr-1 h-4 w-4" />Novo usuário
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setOpenImport(true)}>
+              <Upload className="mr-1 h-4 w-4" />Importar em massa
+            </Button>
+            <Button variant="brand" onClick={() => { setEditing(null); setOpenModal(true); }}>
+              <Plus className="mr-1 h-4 w-4" />Novo usuário
+            </Button>
+          </div>
         }
       />
 
