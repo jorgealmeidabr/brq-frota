@@ -404,6 +404,14 @@ export default function Usuarios() {
         onSaved={reload}
         currentUserId={currentUser?.id ?? null}
       />
+
+      <BulkImportUsersDialog
+        open={openImport}
+        onOpenChange={setOpenImport}
+        existingEmails={rows.map(r => r.email ?? "").filter(Boolean) as string[]}
+        onDone={reload}
+      />
+
     </>
   );
 }
