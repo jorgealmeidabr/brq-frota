@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { BulkImportUsersDialog } from "@/components/BulkImportUsersDialog";
+import { Upload } from "lucide-react";
 
 interface PendingProfile {
   id: string;
