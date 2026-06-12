@@ -14,48 +14,48 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* BRQ brand red/orange */
-    --primary: 14 88% 52%;
+    /* BRQ brand green / cyan / yellow */
+    --primary: 85 56% 42%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 14 95% 62%;
+    --primary-glow: 85 54% 52%;
 
-    --secondary: 222 47% 14%;
+    --secondary: 217 23% 23%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 15% 94%;
-    --muted-foreground: 220 10% 40%;
+    --muted: 210 16% 94%;
+    --muted-foreground: 217 12% 40%;
 
-    --accent: 14 90% 96%;
-    --accent-foreground: 14 80% 35%;
+    --accent: 85 50% 94%;
+    --accent-foreground: 85 60% 26%;
 
-    --success: 142 70% 42%;
+    --success: 85 56% 42%;
     --success-foreground: 0 0% 100%;
-    --warning: 199 89% 48%;
-    --warning-foreground: 0 0% 100%;
+    --warning: 48 100% 50%;
+    --warning-foreground: 217 30% 18%;
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
-    --info: 210 90% 55%;
+    --info: 196 100% 47%;
     --info-foreground: 0 0% 100%;
 
-    --border: 220 15% 89%;
-    --input: 220 15% 89%;
-    --ring: 14 88% 52%;
+    --border: 210 16% 89%;
+    --input: 210 16% 89%;
+    --ring: 85 56% 42%;
 
     --radius: 0.625rem;
 
-    --gradient-brand: linear-gradient(135deg, hsl(14 88% 52%), hsl(14 95% 62%));
-    --gradient-dark: linear-gradient(180deg, hsl(222 47% 11%), hsl(222 47% 16%));
-    --shadow-elevated: 0 10px 30px -10px hsl(14 88% 52% / 0.25);
-    --shadow-card: 0 1px 3px hsl(222 47% 11% / 0.06), 0 1px 2px hsl(222 47% 11% / 0.04);
+    --gradient-brand: linear-gradient(135deg, hsl(85 56% 45%), hsl(196 100% 47%));
+    --gradient-dark: linear-gradient(180deg, hsl(217 23% 16%), hsl(217 23% 23%));
+    --shadow-elevated: 0 10px 30px -10px hsl(85 56% 42% / 0.28);
+    --shadow-card: 0 1px 3px hsl(217 30% 12% / 0.06), 0 1px 2px hsl(217 30% 12% / 0.04);
 
-    --sidebar-background: 222 47% 10%;
-    --sidebar-foreground: 220 15% 85%;
-    --sidebar-primary: 14 88% 52%;
+    --sidebar-background: 217 26% 14%;
+    --sidebar-foreground: 210 15% 85%;
+    --sidebar-primary: 85 56% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 40% 16%;
+    --sidebar-accent: 217 24% 20%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 222 40% 18%;
-    --sidebar-ring: 14 88% 52%;
+    --sidebar-border: 217 24% 22%;
+    --sidebar-ring: 85 56% 45%;
   }
 
   .dark {
@@ -65,31 +65,31 @@
     --card-foreground: 220 15% 95%;
     --popover: 222 47% 10%;
     --popover-foreground: 220 15% 95%;
-    --primary: 14 90% 56%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 14 95% 66%;
-    --secondary: 222 40% 16%;
+    --primary: 85 58% 48%;
+    --primary-foreground: 217 30% 12%;
+    --primary-glow: 85 56% 58%;
+    --secondary: 217 24% 20%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 222 40% 14%;
-    --muted-foreground: 220 10% 65%;
-    --accent: 14 50% 18%;
-    --accent-foreground: 14 95% 75%;
-    --success: 142 60% 48%;
-    --warning: 199 89% 55%;
+    --muted: 217 24% 16%;
+    --muted-foreground: 210 12% 65%;
+    --accent: 85 30% 18%;
+    --accent-foreground: 85 70% 70%;
+    --success: 85 56% 50%;
+    --warning: 48 100% 55%;
     --destructive: 0 70% 55%;
-    --info: 210 90% 60%;
-    --border: 222 40% 18%;
-    --input: 222 40% 18%;
-    --ring: 14 90% 56%;
+    --info: 196 90% 55%;
+    --border: 217 24% 20%;
+    --input: 217 24% 20%;
+    --ring: 85 58% 48%;
     --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.4);
-    --sidebar-background: 222 47% 6%;
-    --sidebar-foreground: 220 15% 80%;
-    --sidebar-primary: 14 90% 56%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 40% 12%;
+    --sidebar-background: 217 28% 9%;
+    --sidebar-foreground: 210 15% 80%;
+    --sidebar-primary: 85 58% 50%;
+    --sidebar-primary-foreground: 217 30% 12%;
+    --sidebar-accent: 217 24% 14%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 222 40% 14%;
-    --sidebar-ring: 14 90% 56%;
+    --sidebar-border: 217 24% 16%;
+    --sidebar-ring: 85 58% 50%;
   }
 }
 

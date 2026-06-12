@@ -12,12 +12,12 @@ interface KpiCardProps {
 }
 
 const toneStyles: Record<string, string> = {
-  default: "text-primary-foreground bg-blue-500",
-  success: "text-secondary-foreground bg-blue-500",
-  warning: "text-primary-foreground bg-blue-500",
-  destructive: "bg-blue-500 text-blue-50",
-  info: "text-primary-foreground bg-blue-500",
-  brand: "bg-gradient-brand text-primary-foreground bg-blue-500",
+  default: "bg-primary text-primary-foreground",
+  success: "bg-success text-success-foreground",
+  warning: "bg-warning text-warning-foreground",
+  destructive: "bg-destructive text-destructive-foreground",
+  info: "bg-info text-info-foreground",
+  brand: "bg-gradient-brand text-primary-foreground",
 };
 
 export function KpiCard({ label, value, hint, icon: Icon, tone = "default", trend }: KpiCardProps) {
